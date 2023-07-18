@@ -1,6 +1,6 @@
 package com.example.ecommerceproject.exception;
 
-import com.example.ecommerceproject.dto.response.ErrorResponse;
+import com.example.ecommerceproject.domain.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

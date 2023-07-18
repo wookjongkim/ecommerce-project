@@ -1,4 +1,4 @@
-package com.example.ecommerceproject.dto.response;
+package com.example.ecommerceproject.domain.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;
