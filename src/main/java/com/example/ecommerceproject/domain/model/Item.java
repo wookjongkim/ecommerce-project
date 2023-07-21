@@ -3,6 +3,7 @@ package com.example.ecommerceproject.domain.model;
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.domain.dto.ItemFormDto;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -52,7 +53,7 @@ public class Item extends BaseTimeEntity {
   private ItemSellStatus saleStatus;
 
   // 단방향으로 설계, Item 조회 시 Stock 엔티티도 함께 로딩됨(Eager Loading이 @OneToOne의 default)
-  @OneToOne
+  @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "stock_id")
   private Stock stock;
 
