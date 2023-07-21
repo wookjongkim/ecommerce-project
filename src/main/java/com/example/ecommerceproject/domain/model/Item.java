@@ -2,6 +2,7 @@ package com.example.ecommerceproject.domain.model;
 
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
+import com.example.ecommerceproject.domain.dto.ItemFormDto;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -24,7 +25,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Item extends BaseTimeEntity{
+public class Item extends BaseTimeEntity {
 
   @Id
   @Column(name = "item_id")
@@ -54,4 +55,15 @@ public class Item extends BaseTimeEntity{
   @OneToOne
   @JoinColumn(name = "stock_id")
   private Stock stock;
+
+  public static Item makeItem(ItemFormDto itemFormDto) {
+    return Item.builder()
+        .sellerId(itemFormDto.getSellerId())
+        .itemName(itemFormDto.getItemName())
+        .price(itemFormDto.getPrice())
+        .itemDetail(itemFormDto.getItemDetail())
+        .cateGory(itemFormDto.getCategory())
+        .saleStatus(itemFormDto.getItemSellStatus())
+        .build();
+  }
 }
