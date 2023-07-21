@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Stock {
 
   @Id
@@ -21,4 +23,10 @@ public class Stock {
   private Long id;
 
   private int quantity; // 재고 수량
+
+  public static Stock makeStock(int quantity){
+    return Stock.builder()
+        .quantity(quantity)
+        .build();
+  }
 }
