@@ -8,6 +8,7 @@ import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.ItemRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.repository.StockRepository;
 import com.example.ecommerceproject.util.ValidUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class ItemService {
 
   private final MemberRepository memberRepository;
   private final ItemRepository itemRepository;
+  private final StockRepository stockRepository;
 
   // @Transactional 사용 이유
   // 만약 트랜잭션을 사용하지 않았다면, 각각의 DB 작업(INSERT, UPDATE 등등)은 별개의 트랜잭션으로 취급됨
@@ -44,9 +46,11 @@ public class ItemService {
 
     // 재고 정보 생성
     Stock stock = Stock.makeStock(itemFormDto.getStockNumber());
+
+    // 연관관계 맺어줌
     item.setStock(stock);
 
-    // 상품 저장시 재고도 같이 저장 됨(OneToOne 단방향 맺어둠)
+    // 상품 저장시 재고도 같이 저장 됨(OneToOne 단방향 맺어둠, PERSIST 옵션을 적용하였기에 가능하다는 점 꼭 인지!)
     itemRepository.save(item);
 
     return "상품 등록이 완료되었습니다!";
