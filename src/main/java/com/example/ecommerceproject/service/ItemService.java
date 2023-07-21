@@ -20,7 +20,6 @@ public class ItemService {
 
   private final MemberRepository memberRepository;
   private final ItemRepository itemRepository;
-  private final StockRepository stockRepository;
 
   // @Transactional 사용 이유
   // 만약 트랜잭션을 사용하지 않았다면, 각각의 DB 작업(INSERT, UPDATE 등등)은 별개의 트랜잭션으로 취급됨
