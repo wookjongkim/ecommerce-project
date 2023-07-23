@@ -2,7 +2,7 @@ package com.example.ecommerceproject.controller;
 
 import com.example.ecommerceproject.domain.dto.ItemFormDto;
 import com.example.ecommerceproject.domain.dto.response.ApiResponse;
-import com.example.ecommerceproject.service.ItemService;
+import com.example.ecommerceproject.service.SellerService;
 import com.example.ecommerceproject.util.ValidUtil;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SellerController {
 
-  private final ItemService itemService;
+  private final SellerService sellerService;
 
   @PostMapping("/item/new")
   public ResponseEntity<ApiResponse> itemNew(@Valid ItemFormDto itemFormDto,
@@ -29,7 +29,7 @@ public class SellerController {
       ValidUtil.extractErrorMessages(bindingResult);
     }
 
-    String msg = itemService.addItem(itemFormDto);
+    String msg = sellerService.addItem(itemFormDto);
 
     return new ResponseEntity<>(new ApiResponse(200, msg), HttpStatus.OK);
   }
