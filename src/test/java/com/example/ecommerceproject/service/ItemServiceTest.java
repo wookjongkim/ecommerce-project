@@ -18,6 +18,7 @@ import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.ItemRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.service.impl.SellerServiceImpl;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ class ItemServiceTest {
   private MemberRepository memberRepository;
 
   @InjectMocks
-  private ItemService itemService;
+  private SellerServiceImpl sellerService;
 
   @Test
   @DisplayName("판매자의 상품 등록 테스트")
@@ -65,7 +66,7 @@ class ItemServiceTest {
     when(itemRepository.save(any())).thenReturn(item);
 
     // when
-    String result = itemService.addItem(itemFormDto);
+    String result = sellerService.addItem(itemFormDto);
 
     // then
     assertEquals("상품 등록이 완료되었습니다!", result);
@@ -100,7 +101,7 @@ class ItemServiceTest {
 
     // when
     BusinessException exception = assertThrows(BusinessException.class,
-        () -> itemService.addItem(itemFormDto));
+        () -> sellerService.addItem(itemFormDto));
 
     // then
     assertEquals(ErrorCode.UNAUTHORIZED_REQUEST, exception.getErrorCode());
