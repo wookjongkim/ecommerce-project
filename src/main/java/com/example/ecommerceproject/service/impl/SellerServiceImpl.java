@@ -62,7 +62,10 @@ public class SellerServiceImpl implements SellerService {
     return "상품 등록이 완료되었습니다!";
   }
 
+  // 여기 readOnly
   @Override
+  // readOnly 사용시, Hibernate와 같은 JPA 구현체는 내부적으로 데이터 변경을 체크하는 작업을 최소화하거나 생략하여 성능 향상
+  @Transactional(readOnly = true)
   public Page<Item> getItems(Long sellerId, LocalDate startDate, LocalDate endDate, int minPrice,
       int maxPrice, ItemSellStatus itemSellStatus, String quantityOrder, Pageable pageable) {
 
