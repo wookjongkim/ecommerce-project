@@ -106,6 +106,4 @@ class SellerServiceTest {
     // then
     assertEquals(ErrorCode.UNAUTHORIZED_REQUEST, exception.getErrorCode());
   }
-
-
 }
