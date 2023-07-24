@@ -42,11 +42,11 @@ class ItemRepositoryTest {
 
   @Test
   @DisplayName("판매자의 전체 상품 조회")
-  public void lookupItems(){
+  public void lookupItems() {
     Stock stock = Stock.builder()
         .quantity(10).build();
 
-    for(int i = 0; i < 10; i++){
+    for (int i = 0; i < 10; i++) {
       Item item = Item.builder()
           .sellerId(member.getId())
           .itemName("Test Name" + i)
@@ -69,9 +69,9 @@ class ItemRepositoryTest {
 
   @Test
   @DisplayName("판매자의 상품을 재고 내림차순으로 조회")
-  public void lookupItemsByStockDesc(){
+  public void lookupItemsByStockDesc() {
 
-    for(int i = 1; i <= 10; i++){
+    for (int i = 1; i <= 10; i++) {
       Stock stock = Stock.builder()
           .quantity(i).build();
 
@@ -103,9 +103,9 @@ class ItemRepositoryTest {
 
   @Test
   @DisplayName("판매자의 상품을 재고 오름차순으로 조회")
-  public void lookupItemsByStockAsc(){
+  public void lookupItemsByStockAsc() {
 
-    for(int i = 1; i <= 10; i++){
+    for (int i = 1; i <= 10; i++) {
       Stock stock = Stock.builder()
           .quantity(i).build();
 
@@ -138,12 +138,12 @@ class ItemRepositoryTest {
 
   @Test
   @DisplayName("판매자의 상품을 가격 범위로 조회")
-  public void lookupItemsByPrice(){
+  public void lookupItemsByPrice() {
 
     Stock stock = Stock.builder()
         .quantity(1).build();
 
-    for(int i = 1; i <= 10; i++){
+    for (int i = 1; i <= 10; i++) {
       Item item = Item.builder()
           .sellerId(member.getId())
           .itemName("Test Name" + i)
@@ -159,7 +159,7 @@ class ItemRepositoryTest {
 
     List<Item> itemList = itemRepository.findAll(
         Specification.where(ItemSpecification.withSellerId(member.getId()))
-            .and(ItemSpecification.withPriceBetween(10000,30000))
+            .and(ItemSpecification.withPriceBetween(10000, 30000))
     );
 
     assertEquals(3, itemList.size());
@@ -167,15 +167,14 @@ class ItemRepositoryTest {
 
   @Test
   @DisplayName("판매자의 상품을 판매 상태를 바탕으로 조회")
-  public void lookupItemsBySellStatus(){
+  public void lookupItemsBySellStatus() {
 
     Stock stock = Stock.builder()
         .quantity(1).build();
 
-
     // 3가지 판매 상태에 따른 물품 등록
 
-    for(int i = 1; i <= 5; i++){
+    for (int i = 1; i <= 5; i++) {
       Item item = Item.builder()
           .sellerId(member.getId())
           .itemName("Test Name" + i)
@@ -189,7 +188,7 @@ class ItemRepositoryTest {
       itemRepository.save(item);
     }
 
-    for(int i = 6; i <= 13; i++){
+    for (int i = 6; i <= 13; i++) {
       Item item = Item.builder()
           .sellerId(member.getId())
           .itemName("Test Name" + i)
@@ -203,7 +202,7 @@ class ItemRepositoryTest {
       itemRepository.save(item);
     }
 
-    for(int i = 13; i <= 15; i++){
+    for (int i = 13; i <= 15; i++) {
       Item item = Item.builder()
           .sellerId(member.getId())
           .itemName("Test Name" + i)
@@ -227,15 +226,15 @@ class ItemRepositoryTest {
 
   @Test
   @DisplayName("판매자의 상품을 등록일자 범위로 조회")
-  public void lookupItemsByDateTime(){
+  public void lookupItemsByDateTime() {
 
     Stock stock = Stock.builder()
         .quantity(1).build();
 
-    LocalDateTime startDate = LocalDate.of(2023,1,8).atStartOfDay();
-    LocalDateTime endDate = LocalDate.of(2023, 5, 8).atTime(23,59,59);
+    LocalDateTime startDate = LocalDate.of(2023, 1, 8).atStartOfDay();
+    LocalDateTime endDate = LocalDate.of(2023, 5, 8).atTime(23, 59, 59);
 
-    for(int i = 0; i < 10; i++){
+    for (int i = 0; i < 10; i++) {
       Item item = Item.builder()
           .sellerId(member.getId())
           .itemName("Test Name" + i)
@@ -246,9 +245,12 @@ class ItemRepositoryTest {
           .stock(stock)
           .build();
 
-      item.setCreatedAt(startDate.plusMonths(i));
-
       itemRepository.save(item);
+
+      // 저장 전에(save(item)) 이 item.setCreatedAt()을 통해 등록일자를 바꾸었을때 save 시 @CreatedDate로 인해
+      // 테스트 당시 시간이 설정되었음. 따라서 save를 통해 영속화를 하고, set을 해주었을때 따로 save를 하지 않아도
+      // 더티 체킹으로 인해 등록일짜가 바뀌고.. 우선 되는것 같음...
+      item.setCreatedAt(startDate.plusMonths(i));
     }
 
     List<Item> itemList = itemRepository.findAll(
@@ -259,4 +261,6 @@ class ItemRepositoryTest {
     System.out.println(startDate + "는 이때야");
     assertEquals(5, itemList.size());
   }
+
+
 }
