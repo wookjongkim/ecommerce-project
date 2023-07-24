@@ -18,7 +18,7 @@ import org.hibernate.validator.constraints.Range;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemFormDto {
+public class ItemFormRequestDto {
 
   // 등록하는 판매자의 식별자
   private Long sellerId;
@@ -42,5 +42,4 @@ public class ItemFormDto {
 
   @NotNull(message = "판매 상태는 필수 입력 값입니다.")
   private ItemSellStatus itemSellStatus;
-
 }

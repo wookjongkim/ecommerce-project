@@ -24,7 +24,7 @@ public class Stock {
 
   private int quantity; // 재고 수량
 
-  public static Stock makeStock(int quantity){
+  public static Stock of(int quantity){
     return Stock.builder()
         .quantity(quantity)
         .build();
