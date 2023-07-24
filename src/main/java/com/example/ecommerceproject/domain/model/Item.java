@@ -2,7 +2,7 @@ package com.example.ecommerceproject.domain.model;
 
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
-import com.example.ecommerceproject.domain.dto.ItemFormDto;
+import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -57,14 +57,14 @@ public class Item extends BaseTimeEntity {
   @JoinColumn(name = "stock_id")
   private Stock stock;
 
-  public static Item makeItem(ItemFormDto itemFormDto) {
+  public static Item of(ItemFormRequestDto itemFormRequestDto) {
     return Item.builder()
-        .sellerId(itemFormDto.getSellerId())
-        .itemName(itemFormDto.getItemName())
-        .price(itemFormDto.getPrice())
-        .itemDetail(itemFormDto.getItemDetail())
-        .cateGory(itemFormDto.getCategory())
-        .saleStatus(itemFormDto.getItemSellStatus())
+        .sellerId(itemFormRequestDto.getSellerId())
+        .itemName(itemFormRequestDto.getItemName())
+        .price(itemFormRequestDto.getPrice())
+        .itemDetail(itemFormRequestDto.getItemDetail())
+        .cateGory(itemFormRequestDto.getCategory())
+        .saleStatus(itemFormRequestDto.getItemSellStatus())
         .build();
   }
 }

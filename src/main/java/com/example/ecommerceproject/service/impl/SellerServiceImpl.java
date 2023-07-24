@@ -1,6 +1,7 @@
 package com.example.ecommerceproject.service.impl;
 
-import com.example.ecommerceproject.domain.dto.ItemFormDto;
+import com.example.ecommerceproject.constant.ItemSellStatus;
+import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
 import com.example.ecommerceproject.domain.model.Stock;
@@ -8,9 +9,15 @@ import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.ItemRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.repository.spec.ItemSpecification;
 import com.example.ecommerceproject.service.SellerService;
 import com.example.ecommerceproject.util.ValidUtil;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +38,8 @@ public class SellerServiceImpl implements SellerService {
   // 이를 방지하기 위해 사용, 동시성 문제 해결하는 것 X
   @Override
   @Transactional
-  public String addItem(ItemFormDto itemFormDto) {
-    Member member = memberRepository.findById(itemFormDto.getSellerId())
+  public String addItem(ItemFormRequestDto itemFormRequestDto) {
+    Member member = memberRepository.findById(itemFormRequestDto.getSellerId())
         .orElseThrow(() -> new BusinessException(ErrorCode.SELLER_NOT_FOUND));
 
     if(!ValidUtil.isSeller(member)){
@@ -41,10 +48,10 @@ public class SellerServiceImpl implements SellerService {
     }
 
     // 상품 생성
-    Item item = Item.makeItem(itemFormDto);
+    Item item = Item.of(itemFormRequestDto);
 
     // 재고 정보 생성
-    Stock stock = Stock.makeStock(itemFormDto.getStockNumber());
+    Stock stock = Stock.of(itemFormRequestDto.getStockNumber());
 
     // 연관관계 맺어줌
     item.setStock(stock);
@@ -53,5 +60,22 @@ public class SellerServiceImpl implements SellerService {
     itemRepository.save(item);
 
     return "상품 등록이 완료되었습니다!";
+  }
+
+  @Override
+  public Page<Item> getItems(Long sellerId, LocalDate startDate, LocalDate endDate, int minPrice,
+      int maxPrice, ItemSellStatus itemSellStatus, String quantityOrder, Pageable pageable) {
+
+    LocalDateTime startDateTime = startDate.atStartOfDay();
+    LocalDateTime endDateTime = endDate.atTime(23,59,59);
+
+    Specification<Item> spec = Specification
+        .where(ItemSpecification.withSellerId(sellerId))
+        .and(ItemSpecification.withCreatedDateBetween(startDateTime, endDateTime))
+        .and(ItemSpecification.withPriceBetween(minPrice, maxPrice))
+        .and(ItemSpecification.withSaleStatus(itemSellStatus))
+        .and(ItemSpecification.withQuantityOrder(quantityOrder));
+
+    return itemRepository.findAll(spec, pageable);
   }
 }

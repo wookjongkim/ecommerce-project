@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.constant.Role;
-import com.example.ecommerceproject.domain.dto.ItemFormDto;
+import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
 import com.example.ecommerceproject.exception.BusinessException;
@@ -28,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ItemServiceTest {
+class SellerServiceTest {
 
   @Mock
   private ItemRepository itemRepository;
@@ -50,7 +50,7 @@ class ItemServiceTest {
         .role(Role.SELLER)
         .build();
 
-    ItemFormDto itemFormDto = ItemFormDto.builder()
+    ItemFormRequestDto itemFormRequestDto = ItemFormRequestDto.builder()
         .sellerId(member.getId())
         .itemName("Test Name")
         .price(1000)
@@ -60,13 +60,13 @@ class ItemServiceTest {
         .stockNumber(10)
         .build();
 
-    Item item = Item.makeItem(itemFormDto);
+    Item item = Item.of(itemFormRequestDto);
 
     when(memberRepository.findById(any())).thenReturn(Optional.of(member));
     when(itemRepository.save(any())).thenReturn(item);
 
     // when
-    String result = sellerService.addItem(itemFormDto);
+    String result = sellerService.addItem(itemFormRequestDto);
 
     // then
     assertEquals("상품 등록이 완료되었습니다!", result);
@@ -85,7 +85,7 @@ class ItemServiceTest {
         .role(Role.BUYER)
         .build();
 
-    ItemFormDto itemFormDto = ItemFormDto.builder()
+    ItemFormRequestDto itemFormRequestDto = ItemFormRequestDto.builder()
         .sellerId(member.getId())
         .itemName("Test Name")
         .price(1000)
@@ -95,15 +95,17 @@ class ItemServiceTest {
         .stockNumber(10)
         .build();
 
-    Item item = Item.makeItem(itemFormDto);
+    Item item = Item.of(itemFormRequestDto);
 
     when(memberRepository.findById(any())).thenReturn(Optional.of(member));
 
     // when
     BusinessException exception = assertThrows(BusinessException.class,
-        () -> sellerService.addItem(itemFormDto));
+        () -> sellerService.addItem(itemFormRequestDto));
 
     // then
     assertEquals(ErrorCode.UNAUTHORIZED_REQUEST, exception.getErrorCode());
   }
+
+
 }
