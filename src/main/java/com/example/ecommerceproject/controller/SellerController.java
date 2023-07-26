@@ -35,16 +35,16 @@ public class SellerController {
 
   private final SellerService sellerService;
 
-  @PostMapping("/item")
-  public ResponseEntity<ApiResponse> registerStore(@Valid ItemFormRequestDto itemFormRequestDto,
-      BindingResult bindingResult) {
+  @PostMapping("/{sellerId}/item")
+  public ResponseEntity<ApiResponse> itemNew(@PathVariable Long sellerId,
+      @Valid ItemFormRequestDto itemFormRequestDto, BindingResult bindingResult) {
 
     // 입력값 검증
     if (bindingResult.hasErrors()) {
       ValidUtil.extractErrorMessages(bindingResult);
     }
 
-    String msg = sellerService.addItem(itemFormRequestDto);
+    String msg = sellerService.addItem(sellerId, itemFormRequestDto);
 
     return new ResponseEntity<>(new ApiResponse(200, msg), HttpStatus.OK);
   }

@@ -60,13 +60,13 @@ class SellerServiceTest {
         .stockNumber(10)
         .build();
 
-    Item item = Item.of(itemFormRequestDto);
+    Item item = Item.of(1L, itemFormRequestDto);
 
     when(memberRepository.findById(any())).thenReturn(Optional.of(member));
     when(itemRepository.save(any())).thenReturn(item);
 
     // when
-    String result = sellerService.addItem(itemFormRequestDto);
+    String result = sellerService.addItem(1L, itemFormRequestDto);
 
     // then
     assertEquals("상품 등록이 완료되었습니다!", result);
@@ -86,7 +86,6 @@ class SellerServiceTest {
         .build();
 
     ItemFormRequestDto itemFormRequestDto = ItemFormRequestDto.builder()
-        .sellerId(member.getId())
         .itemName("Test Name")
         .price(1000)
         .itemDetail("Test Detail")
@@ -95,13 +94,13 @@ class SellerServiceTest {
         .stockNumber(10)
         .build();
 
-    Item item = Item.of(itemFormRequestDto);
+    Item item = Item.of(1L, itemFormRequestDto);
 
     when(memberRepository.findById(any())).thenReturn(Optional.of(member));
 
     // when
     BusinessException exception = assertThrows(BusinessException.class,
-        () -> sellerService.addItem(itemFormRequestDto));
+        () -> sellerService.addItem(1L, itemFormRequestDto));
 
     // then
     assertEquals(ErrorCode.UNAUTHORIZED_REQUEST, exception.getErrorCode());

@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface SellerService {
 
-  String addItem(ItemFormRequestDto itemFormRequestDto);
+  String addItem(Long sellerId, ItemFormRequestDto itemFormRequestDto);
 
   Page<Item> getItems(Long sellerId, LocalDate startDate, LocalDate endDate,
       int minPrice, int maxPrice, ItemSellStatus itemSellStatus,

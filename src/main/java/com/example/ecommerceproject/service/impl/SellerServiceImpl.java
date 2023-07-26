@@ -38,8 +38,8 @@ public class SellerServiceImpl implements SellerService {
   // 이를 방지하기 위해 사용, 동시성 문제 해결하는 것 X
   @Override
   @Transactional
-  public String addItem(ItemFormRequestDto itemFormRequestDto) {
-    Member member = memberRepository.findById(itemFormRequestDto.getSellerId())
+  public String addItem(Long sellerId, ItemFormRequestDto itemFormRequestDto) {
+    Member member = memberRepository.findById(sellerId)
         .orElseThrow(() -> new BusinessException(ErrorCode.SELLER_NOT_FOUND));
 
     if(!ValidUtil.isSeller(member)){
@@ -48,7 +48,7 @@ public class SellerServiceImpl implements SellerService {
     }
 
     // 상품 생성
-    Item item = Item.of(itemFormRequestDto);
+    Item item = Item.of(sellerId, itemFormRequestDto);
 
     // 재고 정보 생성
     Stock stock = Stock.of(itemFormRequestDto.getStockNumber());

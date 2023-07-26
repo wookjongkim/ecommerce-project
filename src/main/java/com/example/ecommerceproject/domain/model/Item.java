@@ -57,9 +57,9 @@ public class Item extends BaseTimeEntity {
   @JoinColumn(name = "stock_id")
   private Stock stock;
 
-  public static Item of(ItemFormRequestDto itemFormRequestDto) {
+  public static Item of(Long sellerId, ItemFormRequestDto itemFormRequestDto) {
     return Item.builder()
-        .sellerId(itemFormRequestDto.getSellerId())
+        .sellerId(sellerId)
         .itemName(itemFormRequestDto.getItemName())
         .price(itemFormRequestDto.getPrice())
         .itemDetail(itemFormRequestDto.getItemDetail())
