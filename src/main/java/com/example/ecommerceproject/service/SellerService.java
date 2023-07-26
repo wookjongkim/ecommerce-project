@@ -1,6 +1,7 @@
 package com.example.ecommerceproject.service;
 
 import com.example.ecommerceproject.constant.ItemSellStatus;
+import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.model.Item;
 import java.time.LocalDate;
@@ -14,5 +15,7 @@ public interface SellerService {
   Page<Item> getItems(Long sellerId, LocalDate startDate, LocalDate endDate,
       int minPrice, int maxPrice, ItemSellStatus itemSellStatus,
       String quantityOrder, Pageable pageable);
+
+  ItemDetailDto getItem(Long sellerId, Long itemId);
 }
 
