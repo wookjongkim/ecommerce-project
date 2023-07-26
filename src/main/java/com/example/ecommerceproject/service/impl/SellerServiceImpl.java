@@ -3,6 +3,7 @@ package com.example.ecommerceproject.service.impl;
 import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
+import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
 import com.example.ecommerceproject.domain.model.Stock;
@@ -90,5 +91,23 @@ public class SellerServiceImpl implements SellerService {
         .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_MATCH));
 
     return ItemDetailDto.of(item);
+  }
+
+  @Override
+  @Transactional
+  public ItemUpdateDto editItem(Long sellerId, Long itemId, ItemUpdateDto itemUpdateDto) {
+    Item item = itemRepository.findByIdAndSellerId(sellerId, itemId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_MATCH));
+
+    item.setItemName(itemUpdateDto.getItemName());
+    item.setPrice(itemUpdateDto.getPrice());
+    item.setItemDetail(itemUpdateDto.getItemDetail());
+    item.setSaleStatus(itemUpdateDto.getSaleStatus());
+    item.setCateGory(itemUpdateDto.getCategory());
+
+    // 변경된 엔티티 저장 (JPA의 역속성 컨텍스트에 의해 자동으로 DB에 반영됩니다)
+    itemRepository.save(item);
+
+    return ItemUpdateDto.of(item);
   }
 }

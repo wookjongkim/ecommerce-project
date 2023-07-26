@@ -54,7 +54,6 @@ class SellerServiceTest {
         .build();
 
     ItemFormRequestDto itemFormRequestDto = ItemFormRequestDto.builder()
-        .sellerId(member.getId())
         .itemName("Test Name")
         .price(1000)
         .itemDetail("Test Detail")

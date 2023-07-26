@@ -3,6 +3,7 @@ package com.example.ecommerceproject.controller;
 import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
+import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
 import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
 import com.example.ecommerceproject.domain.dto.response.ApiResponse;
 import com.example.ecommerceproject.domain.dto.response.SuccessResponse;
@@ -23,6 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -91,5 +93,18 @@ public class SellerController {
 
     return new ResponseEntity<>(new SuccessResponse(200, "상품 상세 정보 조회가 완료되었습니다.", itemDetail),
         HttpStatus.OK);
+  }
+
+  @PutMapping("/{sellerId}/items/{itemId}")
+  public ResponseEntity<ApiResponse> editItem(@PathVariable Long sellerId,
+      @PathVariable Long itemId, @Valid ItemUpdateDto itemUpdateDto, BindingResult bindingResult) {
+
+    if (bindingResult.hasErrors()) {
+      ValidUtil.extractErrorMessages(bindingResult);
+    }
+
+    ItemUpdateDto updateDto = sellerService.editItem(sellerId, itemId, itemUpdateDto);
+
+    return new ResponseEntity<>(new SuccessResponse<>(200, "상품 수정이 완료되었습니다.", updateDto), HttpStatus.OK);
   }
 }
