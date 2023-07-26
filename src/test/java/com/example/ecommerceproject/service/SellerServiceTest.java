@@ -15,6 +15,7 @@ import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.constant.Role;
 import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
+import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
 import com.example.ecommerceproject.exception.BusinessException;
@@ -147,5 +148,40 @@ class SellerServiceTest {
 
     // Then
     assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.ITEM_NOT_MATCH);
+  }
+
+  @Test
+  @DisplayName("판매자의 상품 수정 테스트")
+  void editItem(){
+    // Given
+    Item item = Item.builder()
+        .id(1L)
+        .sellerId(1L)
+        .itemName("테스트 네임1")
+        .price(1000)
+        .itemDetail("테스트 상품입니다.")
+        .cateGory(Category.FOOD)
+        .saleStatus(ItemSellStatus.SELL).build();
+
+    ItemUpdateDto updateRequest = ItemUpdateDto.builder()
+        .itemName("바꾼 이름1")
+        .price(10001)
+        .itemDetail("바꾼 설명입니다.")
+        .category(Category.BEAUTY)
+        .saleStatus(ItemSellStatus.SELL_STOPPED)
+        .build();
+
+    when(itemRepository.findByIdAndSellerId(anyLong(), anyLong())).thenReturn(Optional.of(item));
+
+    // When
+    ItemUpdateDto itemUpdateDto = sellerService.editItem(1L, 1L, updateRequest);
+
+    // Then
+    assertThat(itemUpdateDto).isNotNull();
+    assertThat(itemUpdateDto.getItemName()).isEqualTo(updateRequest.getItemName());
+    assertThat(itemUpdateDto.getPrice()).isEqualTo(updateRequest.getPrice());
+    assertThat(itemUpdateDto.getItemDetail()).isEqualTo(updateRequest.getItemDetail());
+    assertThat(itemUpdateDto.getSaleStatus()).isEqualTo(updateRequest.getSaleStatus());
+    assertThat(itemUpdateDto.getCategory()).isEqualTo(updateRequest.getCategory());
   }
 }
