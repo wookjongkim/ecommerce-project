@@ -20,9 +20,6 @@ import org.hibernate.validator.constraints.Range;
 @Builder
 public class ItemFormRequestDto {
 
-  // 등록하는 판매자의 식별자
-  private Long sellerId;
-
   @NotBlank(message = "상품명은 필수 입력값입니다.")
   private String itemName;
 
