@@ -1,9 +1,11 @@
 package com.example.ecommerceproject.service;
 
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,6 +13,7 @@ import static org.mockito.Mockito.when;
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.constant.Role;
+import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
@@ -104,5 +107,46 @@ class SellerServiceTest {
 
     // then
     assertEquals(ErrorCode.UNAUTHORIZED_REQUEST, exception.getErrorCode());
+  }
+
+  @Test
+  @DisplayName("판매자의 상품 상세 보기 테스트")
+  void getItemDetail(){
+
+    // Given
+    Item item = Item.builder()
+        .id(1L)
+        .sellerId(1L)
+        .itemName("테스트 네임1")
+        .price(1000)
+        .itemDetail("테스트 상품입니다.")
+        .cateGory(Category.FOOD)
+        .saleStatus(ItemSellStatus.SELL).build();
+
+    when(itemRepository.findByIdAndSellerId(anyLong(), anyLong())).thenReturn(Optional.of(item));
+
+    // When
+    ItemDetailDto itemDetail = sellerService.getItem(1L, 1L);
+
+    // Then
+    assertThat(itemDetail).isNotNull();
+    assertThat(itemDetail.getItemName()).isEqualTo(item.getItemName());
+    assertThat(itemDetail.getPrice()).isEqualTo(item.getPrice());
+    assertThat(itemDetail.getItemDetail()).isEqualTo(item.getItemDetail());
+    assertThat(itemDetail.getSaleStatus()).isEqualTo(item.getSaleStatus());
+    assertThat(itemDetail.getCategory()).isEqualTo(item.getCateGory());
+  }
+
+  @Test
+  @DisplayName("판매자의 상품 상세 보기 실패 테스트")
+  void getItemDetailFailure() {
+    // Given
+    when(itemRepository.findByIdAndSellerId(anyLong(), anyLong())).thenReturn(Optional.empty());
+
+    // When
+    BusinessException exception = assertThrows(BusinessException.class, () -> sellerService.getItem(1L, 1L));
+
+    // Then
+    assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.ITEM_NOT_MATCH);
   }
 }
