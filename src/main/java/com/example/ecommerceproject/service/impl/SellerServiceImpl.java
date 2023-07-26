@@ -1,6 +1,7 @@
 package com.example.ecommerceproject.service.impl;
 
 import com.example.ecommerceproject.constant.ItemSellStatus;
+import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
@@ -80,5 +81,14 @@ public class SellerServiceImpl implements SellerService {
         .and(ItemSpecification.withQuantityOrder(quantityOrder));
 
     return itemRepository.findAll(spec, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public ItemDetailDto getItem(Long sellerId, Long itemId) {
+    Item item = itemRepository.findByIdAndSellerId(sellerId, itemId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_MATCH));
+
+    return ItemDetailDto.of(item);
   }
 }
