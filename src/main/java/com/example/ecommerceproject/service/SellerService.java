@@ -4,6 +4,7 @@ import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
+import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
 import com.example.ecommerceproject.domain.model.Item;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;
@@ -13,7 +14,7 @@ public interface SellerService {
 
   String addItem(Long sellerId, ItemFormRequestDto itemFormRequestDto);
 
-  Page<Item> getItems(Long sellerId, LocalDate startDate, LocalDate endDate,
+  Page<SellerItemResponseDto> getItems(Long sellerId, LocalDate startDate, LocalDate endDate,
       int minPrice, int maxPrice, ItemSellStatus itemSellStatus,
       String quantityOrder, Pageable pageable);
 
