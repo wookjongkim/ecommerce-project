@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,12 +17,15 @@ import com.example.ecommerceproject.constant.Role;
 import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
+import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
+import com.example.ecommerceproject.domain.model.Stock;
 import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.ItemRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.repository.StockRepository;
 import com.example.ecommerceproject.service.impl.SellerServiceImpl;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +43,9 @@ class SellerServiceTest {
 
   @Mock
   private MemberRepository memberRepository;
+
+  @Mock
+  private StockRepository stockRepository;
 
   @InjectMocks
   private SellerServiceImpl sellerService;
@@ -183,5 +190,35 @@ class SellerServiceTest {
     assertThat(itemUpdateDto.getItemDetail()).isEqualTo(updateRequest.getItemDetail());
     assertThat(itemUpdateDto.getSaleStatus()).isEqualTo(updateRequest.getSaleStatus());
     assertThat(itemUpdateDto.getCategory()).isEqualTo(updateRequest.getCategory());
+  }
+
+  @Test
+  @DisplayName("판매자의 상품 제고 추가 테스트")
+  void addItemStock(){
+    // Given
+    Stock stock = Stock.builder()
+        .id(1L)
+        .quantity(100).build();
+
+    Item item = Item.builder()
+        .id(1L)
+        .sellerId(1L)
+        .itemName("테스트 네임1")
+        .price(1000)
+        .itemDetail("테스트 상품입니다.")
+        .cateGory(Category.FOOD)
+        .stock(stock)
+        .saleStatus(ItemSellStatus.SELL).build();
+
+
+    when(itemRepository.findByIdAndSellerId(anyLong(), anyLong())).thenReturn(Optional.of(item));
+    when(stockRepository.findByIdForUpdate(anyLong())).thenReturn(Optional.of(stock));
+
+    // When
+    SellerItemResponseDto itemResponseDto = sellerService.addStock(1L, 1L, 100);
+
+    // Then
+    assertThat(itemResponseDto).isNotNull();
+    assertThat(itemResponseDto.getQuantity()).isEqualTo(200);
   }
 }
