@@ -106,4 +106,15 @@ public class SellerController {
     return new ResponseEntity<>(new SuccessResponse<>(200, "상품 수정이 완료되었습니다.", updateDto),
         HttpStatus.OK);
   }
+
+  // PUT을 사용할수도 있지만 이 경우엔 멱등성을 가지지 않기에 POST가 어울린다고 판단.
+  @PostMapping("/{sellerId}/items/{itemId}/stock")
+  public ResponseEntity<SuccessResponse> addItemStock(@PathVariable Long sellerId,
+      @PathVariable Long itemId, int addNum){
+
+    SellerItemResponseDto item = sellerService.addStock(sellerId, itemId, addNum);
+
+    return new ResponseEntity<>(new SuccessResponse(200, "재고 추가가 완료되었습니다.",item),
+        HttpStatus.OK);
+  }
 }

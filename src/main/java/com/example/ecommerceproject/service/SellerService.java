@@ -21,5 +21,7 @@ public interface SellerService {
   ItemDetailDto getItem(Long sellerId, Long itemId);
 
   ItemUpdateDto editItem(Long sellerId, Long itemId, ItemUpdateDto itemUpdateDto);
+
+  SellerItemResponseDto addStock(Long sellerId, Long itemId, int addNum);
 }
 
