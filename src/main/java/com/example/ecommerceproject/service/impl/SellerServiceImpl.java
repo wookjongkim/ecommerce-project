@@ -4,6 +4,7 @@ import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
+import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
 import com.example.ecommerceproject.domain.model.Stock;
@@ -68,7 +69,7 @@ public class SellerServiceImpl implements SellerService {
   @Override
   // readOnly 사용시, Hibernate와 같은 JPA 구현체는 내부적으로 데이터 변경을 체크하는 작업을 최소화하거나 생략하여 성능 향상
   @Transactional(readOnly = true)
-  public Page<Item> getItems(Long sellerId, LocalDate startDate, LocalDate endDate, int minPrice,
+  public Page<SellerItemResponseDto> getItems(Long sellerId, LocalDate startDate, LocalDate endDate, int minPrice,
       int maxPrice, ItemSellStatus itemSellStatus, String quantityOrder, Pageable pageable) {
 
     LocalDateTime startDateTime = startDate.atStartOfDay();
@@ -81,7 +82,9 @@ public class SellerServiceImpl implements SellerService {
         .and(ItemSpecification.withSaleStatus(itemSellStatus))
         .and(ItemSpecification.withQuantityOrder(quantityOrder));
 
-    return itemRepository.findAll(spec, pageable);
+    Page<Item> items = itemRepository.findAll(spec, pageable);
+
+    return items.map(SellerItemResponseDto::of);
   }
 
   @Override

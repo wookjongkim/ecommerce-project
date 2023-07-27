@@ -74,15 +74,13 @@ public class SellerController {
       startDate = LocalDate.of(1970, 1, 1);
     }
     if (endDate == null) {
-      endDate = LocalDate.of(2023, 12, 31);
+      endDate = LocalDate.now();
     }
 
-    Page<Item> items = sellerService.getItems(sellerId, startDate, endDate, minPrice, maxPrice,
-        saleStatus, quantityOrder, pageable);
+    Page<SellerItemResponseDto> items = sellerService.getItems(sellerId, startDate, endDate,
+        minPrice, maxPrice, saleStatus, quantityOrder, pageable);
 
-    Page<SellerItemResponseDto> itemList = items.map(SellerItemResponseDto::of);
-
-    return new ResponseEntity<>(new SuccessResponse(200, "상품 조회가 완료되었습니다.", itemList),
+    return new ResponseEntity<>(new SuccessResponse(200, "상품 조회가 완료되었습니다.", items),
         HttpStatus.OK);
   }
 
@@ -105,6 +103,7 @@ public class SellerController {
 
     ItemUpdateDto updateDto = sellerService.editItem(sellerId, itemId, itemUpdateDto);
 
-    return new ResponseEntity<>(new SuccessResponse<>(200, "상품 수정이 완료되었습니다.", updateDto), HttpStatus.OK);
+    return new ResponseEntity<>(new SuccessResponse<>(200, "상품 수정이 완료되었습니다.", updateDto),
+        HttpStatus.OK);
   }
 }
