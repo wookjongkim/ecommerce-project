@@ -12,6 +12,7 @@ import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.ItemRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.repository.StockRepository;
 import com.example.ecommerceproject.repository.spec.ItemSpecification;
 import com.example.ecommerceproject.service.SellerService;
 import com.example.ecommerceproject.util.ValidUtil;
@@ -30,7 +31,7 @@ public class SellerServiceImpl implements SellerService {
 
   private final MemberRepository memberRepository;
   private final ItemRepository itemRepository;
-
+  private final StockRepository stockRepository;
 
   // @Transactional 사용 이유
   // 만약 트랜잭션을 사용하지 않았다면, 각각의 DB 작업(INSERT, UPDATE 등등)은 별개의 트랜잭션으로 취급됨
@@ -112,5 +113,25 @@ public class SellerServiceImpl implements SellerService {
     itemRepository.save(item);
 
     return ItemUpdateDto.of(item);
+  }
+
+  @Override
+  @Transactional
+  public SellerItemResponseDto addStock(Long sellerId, Long itemId, int addNum) {
+    Item item = itemRepository.findByIdAndSellerId(sellerId, itemId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_MATCH));
+
+
+    Stock stock = stockRepository.findByIdForUpdate(item.getStock().getId())
+        .orElseThrow(() -> new BusinessException(ErrorCode.STOCK_NOT_FOUND));
+
+
+    stock.setQuantity(stock.getQuantity() + addNum);
+
+//    findById 사용시 해당 ID를 가진 엔티티가 검색되고, 이 엔티티는 자동으로 영속성 컨텍스트에 포함됨
+//    이렇게 영속화된 Stock을 변경하면, 이 변경사항은 영속성 컨텍스트에 의해 추적되고, 트랜잭션 종료될때 DB에 반영
+//    stockRepository.save(stock);
+
+    return SellerItemResponseDto.of(item);
   }
 }
