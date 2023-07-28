@@ -249,7 +249,7 @@ class ItemRepositoryTest {
 
       // 저장 전에(save(item)) 이 item.setCreatedAt()을 통해 등록일자를 바꾸었을때 save 시 @CreatedDate로 인해
       // 테스트 당시 시간이 설정되었음. 따라서 save를 통해 영속화를 하고, set을 해주었을때 따로 save를 하지 않아도
-      // 더티 체킹으로 인해 등록일짜가 바뀌고.. 우선 되는것 같음...
+      // 더티 체킹으로 인해 등록일짜가 바뀜
       item.setCreatedAt(startDate.plusMonths(i));
     }
 
@@ -258,7 +258,6 @@ class ItemRepositoryTest {
             .and(ItemSpecification.withCreatedDateBetween(startDate, endDate))
     );
 
-    System.out.println(startDate + "는 이때야");
     assertEquals(5, itemList.size());
   }
 
