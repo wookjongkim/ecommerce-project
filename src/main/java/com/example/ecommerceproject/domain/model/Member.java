@@ -2,6 +2,7 @@ package com.example.ecommerceproject.domain.model;
 
 
 import com.example.ecommerceproject.constant.Role;
+import com.example.ecommerceproject.domain.dto.SignUpFormDto;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -41,4 +42,15 @@ public class Member extends BaseTimeEntity {
 
   @Enumerated(EnumType.STRING)
   private Role role;
+
+  public static Member of(SignUpFormDto signUpFormDto) {
+    return Member.builder()
+        .email(signUpFormDto.getEmail())
+        .name(signUpFormDto.getName())
+        .password(signUpFormDto.getPassword())
+        .address(signUpFormDto.getAddress())
+        .phoneNumber(signUpFormDto.getPhoneNumber())
+        .role(signUpFormDto.getRole())
+        .build();
+  }
 }
