@@ -12,6 +12,7 @@ import com.example.ecommerceproject.domain.dto.SignUpFormDto;
 import com.example.ecommerceproject.domain.model.Member;
 import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
+import com.example.ecommerceproject.repository.BuyerBalanceRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,12 +34,15 @@ class MemberServiceTest {
   @Mock
   private MemberRepository memberRepository;
 
+  @Mock
+  private BuyerBalanceRepository buyerBalanceRepository;
+
   private PasswordEncoder passwordEncoder;
 
   @BeforeEach
   void setUp(){
     passwordEncoder = new BCryptPasswordEncoder();
-    memberService = new MemberService(passwordEncoder, memberRepository);
+    memberService = new MemberService(passwordEncoder, memberRepository, buyerBalanceRepository);
   }
 
   @Test
