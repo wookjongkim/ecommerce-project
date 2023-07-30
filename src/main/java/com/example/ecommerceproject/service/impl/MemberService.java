@@ -53,7 +53,7 @@ public class MemberService {
 
   private void createBalanceInfo(Long memberId) {
     BuyerBalance balance = BuyerBalance.builder()
-        .userId(memberId)
+        .memberId(memberId)
         .balance(0L).build();
 
     buyerBalanceRepository.save(balance);

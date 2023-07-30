@@ -24,7 +24,8 @@ public class BuyerBalance {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private Long userId;
+  // 연관관계 따로 맺지 않았음
+  private Long memberId;
 
   private Long balance;
 }
