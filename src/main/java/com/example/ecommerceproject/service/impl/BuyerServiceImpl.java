@@ -1,6 +1,5 @@
 package com.example.ecommerceproject.service.impl;
 
-import com.example.ecommerceproject.constant.Role;
 import com.example.ecommerceproject.domain.dto.MemberInfoDto;
 import com.example.ecommerceproject.domain.model.BuyerBalance;
 import com.example.ecommerceproject.domain.model.Member;
