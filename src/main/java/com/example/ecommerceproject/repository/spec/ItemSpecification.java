@@ -1,5 +1,6 @@
 package com.example.ecommerceproject.repository.spec;
 
+import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.domain.model.Item;
 import java.time.LocalDateTime;
@@ -32,6 +33,20 @@ public class ItemSpecification {
   public static Specification<Item> withSaleStatus(ItemSellStatus itemSellStatus) {
     return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("saleStatus"),
         itemSellStatus));
+  }
+
+  public static Specification<Item> withComponent(String component){
+    return ((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("itemName"),
+        "%" + component + "%"));
+  }
+
+  public static Specification<Item> withCategory(Category category){
+    return ((root, query, criteriaBuilder) -> {
+      if(category == null){
+        return criteriaBuilder.conjunction();
+      }
+      return criteriaBuilder.equal(root.get("cateGory"), category);
+    });
   }
 
   public static Specification<Item> withQuantityOrder(String order) {

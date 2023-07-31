@@ -118,7 +118,7 @@ public class SellerServiceImpl implements SellerService {
   @Override
   @Transactional
   public SellerItemResponseDto addStock(Long sellerId, Long itemId, int addNum) {
-    Item item = itemRepository.findByIdAndSellerId(sellerId, itemId)
+    Item item = itemRepository.findByIdAndSellerId(itemId, sellerId)
         .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_MATCH));
 
 

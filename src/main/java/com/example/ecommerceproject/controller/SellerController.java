@@ -7,7 +7,6 @@ import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
 import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
 import com.example.ecommerceproject.domain.dto.response.ApiResponse;
 import com.example.ecommerceproject.domain.dto.response.SuccessResponse;
-import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.service.SellerService;
 import com.example.ecommerceproject.util.ValidUtil;
 import java.time.LocalDate;
