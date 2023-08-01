@@ -5,10 +5,12 @@ import com.example.ecommerceproject.domain.dto.LoginFormDto;
 import com.example.ecommerceproject.domain.dto.SignUpFormDto;
 import com.example.ecommerceproject.domain.model.BuyerBalance;
 import com.example.ecommerceproject.domain.model.Member;
+import com.example.ecommerceproject.domain.model.SellerRevenue;
 import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.BuyerBalanceRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.repository.SellerRevenueRepository;
 import com.example.ecommerceproject.util.ValidUtil;
 import java.util.Optional;
 import javax.validation.Valid;
@@ -29,6 +31,8 @@ public class MemberService {
 
   private final BuyerBalanceRepository buyerBalanceRepository;
 
+  private final SellerRevenueRepository sellerRevenueRepository;
+
   // 회원가입과 잔액 생성이 동시에 이루어지고 반영되기 위해 하나의 트랜잭션으로 처리되도록 하였음
   @Transactional
   public String signUp(SignUpFormDto signUpFormDto) {
@@ -44,19 +48,29 @@ public class MemberService {
     memberRepository.save(member);
 
     if (member.getRole() == Role.BUYER) {
-      // 구매자의 경우 잔액 정보 생성
+      // 구매자의 경우 잔액 정보 계좌 생성
       createBalanceInfo(member.getId());
+    }else{
+      // 판매자의 경우 수익 정보 계좌 생성
+      createRevenueInfo(member.getId());
     }
 
     return member.getName();
   }
-
   private void createBalanceInfo(Long memberId) {
     BuyerBalance balance = BuyerBalance.builder()
         .memberId(memberId)
         .balance(0L).build();
 
     buyerBalanceRepository.save(balance);
+  }
+
+  private void createRevenueInfo(Long memberId) {
+    SellerRevenue sellerRevenue = SellerRevenue.builder()
+        .memberId(memberId)
+        .revenue(0L).build();
+
+    sellerRevenueRepository.save(sellerRevenue);
   }
 
   @Transactional(readOnly = true)

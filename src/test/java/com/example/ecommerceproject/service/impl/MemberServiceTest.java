@@ -14,6 +14,7 @@ import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.BuyerBalanceRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.repository.SellerRevenueRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,12 +38,15 @@ class MemberServiceTest {
   @Mock
   private BuyerBalanceRepository buyerBalanceRepository;
 
+  @Mock
+  private SellerRevenueRepository sellerRevenueRepository;
+
   private PasswordEncoder passwordEncoder;
 
   @BeforeEach
   void setUp(){
     passwordEncoder = new BCryptPasswordEncoder();
-    memberService = new MemberService(passwordEncoder, memberRepository, buyerBalanceRepository);
+    memberService = new MemberService(passwordEncoder, memberRepository, buyerBalanceRepository, sellerRevenueRepository);
   }
 
   @Test
