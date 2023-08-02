@@ -9,22 +9,33 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SellerRevenue {
+public class OrderItem {
 
   @Id
-  @Column(name = "revenue_id")
+  @Column(name = "order_item_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private Long memberId;
+  private Long itemId;
 
-  private Long revenue;
+  private String name;
+
+  private int price;
+
+  private int quantity;
+
+  public static OrderItem of(Item item, int quantity){
+    return OrderItem.builder()
+        .itemId(item.getId())
+        .name(item.getItemName())
+        .price(item.getPrice())
+        .quantity(quantity)
+        .build();
+  }
 }
