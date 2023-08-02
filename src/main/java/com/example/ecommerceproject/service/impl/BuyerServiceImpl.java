@@ -2,18 +2,34 @@ package com.example.ecommerceproject.service.impl;
 
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
+import com.example.ecommerceproject.constant.OrderStatus;
 import com.example.ecommerceproject.domain.dto.BuyerItemResponseDto;
 import com.example.ecommerceproject.domain.dto.MemberInfoDto;
+import com.example.ecommerceproject.domain.dto.OrderRequestDto;
+import com.example.ecommerceproject.domain.dto.OrderRequestDto.ItemOrderDto;
+import com.example.ecommerceproject.domain.dto.OrderResponseDto;
 import com.example.ecommerceproject.domain.model.BuyerBalance;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
+import com.example.ecommerceproject.domain.model.Order;
+import com.example.ecommerceproject.domain.model.OrderItem;
+import com.example.ecommerceproject.domain.model.SellerRevenue;
+import com.example.ecommerceproject.domain.model.Stock;
 import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.BuyerBalanceRepository;
 import com.example.ecommerceproject.repository.ItemRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.repository.OrderRepository;
+import com.example.ecommerceproject.repository.SellerRevenueRepository;
+import com.example.ecommerceproject.repository.StockRepository;
 import com.example.ecommerceproject.repository.spec.ItemSpecification;
 import com.example.ecommerceproject.service.BuyerService;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +42,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class BuyerServiceImpl implements BuyerService {
 
   private final BuyerBalanceRepository buyerBalanceRepository;
+
+  private final SellerRevenueRepository sellerRevenueRepository;
   private final MemberRepository memberRepository;
   private final ItemRepository itemRepository;
+  private final StockRepository stockRepository;
+  private final OrderRepository orderRepository;
 
   @Transactional
   @Override
@@ -58,5 +78,149 @@ public class BuyerServiceImpl implements BuyerService {
     Page<Item> items = itemRepository.findAll(spec, pageable);
 
     return items.map(BuyerItemResponseDto::of);
+  }
+
+  @Override
+  @Transactional
+  public OrderResponseDto orderItems(Long buyerId, OrderRequestDto orderRequestDto) {
+    List<Item> itemList = retrieveItemList(orderRequestDto);
+    List<ItemOrderDto> itemOrders = orderRequestDto.getItemOrders();
+
+    // 주문하려는 상품 중 SOLD_OUT or SELL_STOPPED 상태의 상품이 있는지 조회
+    validateOrderStatus(itemList);
+
+    // 주문하려는 상품의 재고가 충분한지 확인
+    validateStockAvailability(itemList, itemOrders);
+
+    // 총 구매 금액 계산
+    long totalPrice = calculateTotalPrice(itemList, itemOrders);
+
+    // 구매자의 잔고가 충분한지 확인
+    validateBuyerBalance(buyerId, totalPrice);
+
+    // 구매 하고자 하는 상품의 재고를 감소시킴
+    reduceStock(itemList, itemOrders);
+
+    // 각 판매자의 대한 수익을 계산한 후, 이를 판매자의 계좌 반영
+    increaseSellerRevenues(getSellersRevenue(itemList, itemOrders));
+
+    // 주문 정보를 생성 후 저장
+    Order order = createAndSaveOrder(buyerId, itemList, itemOrders, totalPrice);
+
+    // Response 형식에 맞게 Convert
+    return OrderResponseDto.of(order);
+  }
+
+  private List<Item> retrieveItemList(OrderRequestDto orderRequestDto) {
+    List<Long> itemIds = orderRequestDto.getItemOrders().stream()
+        .map(ItemOrderDto::getItemId)
+        .collect(Collectors.toList());
+
+    List<Item> items = itemRepository.findByIdIn(itemIds);
+
+    //  In의 경우 결과를 반환하는 순서가 보장되지 않으므로 주문 순서대로 Item을 정렬,
+    items.sort(Comparator.comparing(item -> itemIds.indexOf(item.getId())));
+
+    return items;
+  }
+
+  private void validateOrderStatus(List<Item> itemList) {
+    if (isOrderStatusUnorderable(itemList)) {
+      throw new BusinessException(ErrorCode.UNORDERABLE_ITEM_INCLUDED);
+    }
+  }
+
+  private boolean isOrderStatusUnorderable(List<Item> itemList) {
+    return itemList.stream()
+        .anyMatch(item -> item.getSaleStatus() == ItemSellStatus.SOLD_OUT
+            || item.getSaleStatus() == ItemSellStatus.SELL_STOPPED);
+  }
+
+  private void validateStockAvailability(List<Item> itemList, List<ItemOrderDto> itemOrders) {
+    if (isOutOfStock(itemList, itemOrders)) {
+      throw new BusinessException(ErrorCode.OUT_OF_STOCK_ITEM_INCLUDED);
+    }
+  }
+
+  private boolean isOutOfStock(List<Item> itemList, List<ItemOrderDto> itemOrders) {
+    return IntStream.range(0, itemList.size())
+        .anyMatch(i -> {
+          // 여기서 stock에 대해 조회(findByIdForUpdate)시 row-level에 락을 검
+          Stock stock = stockRepository.findByIdForUpdate(itemList.get(i).getStock().getId())
+              .orElseThrow(() -> new BusinessException(ErrorCode.STOCK_NOT_FOUND));
+
+          return stock.getQuantity() < itemOrders.get(i).getQuantity();
+        });
+  }
+
+  private long calculateTotalPrice(List<Item> itemList, List<ItemOrderDto> itemOrders) {
+    return IntStream.range(0, itemList.size())
+        .mapToLong(i -> itemList.get(i).getPrice() * itemOrders.get(i).getQuantity())
+        .sum();
+  }
+
+  private void validateBuyerBalance(Long buyerId, long totalPrice) {
+    // 이 과정에서 구매자의 계좌 조회시(findByMemberId) row-level의 락을 검
+    BuyerBalance buyerBalance = buyerBalanceRepository.findByMemberId(buyerId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.BUYER_BALANCE_NOT_FOUND));
+
+    if (totalPrice > buyerBalance.getBalance()) {
+      throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE);
+    }
+
+    buyerBalance.setBalance(buyerBalance.getBalance() - totalPrice);
+  }
+
+  private HashMap<Long, Long> getSellersRevenue(List<Item> itemList, List<ItemOrderDto> itemOrders) {
+    HashMap<Long, Long> map = new HashMap<>();
+
+    IntStream.range(0, itemList.size())
+        .forEach(i -> {
+          Long sellerId = itemList.get(i).getSellerId();
+          Long profit = (long) itemList.get(i).getPrice() * itemOrders.get(i).getQuantity();
+          map.put(sellerId, map.getOrDefault(sellerId, 0L) + profit);
+        });
+
+    return map;
+  }
+
+  private void reduceStock(List<Item> itemList, List<ItemOrderDto> itemOrders) {
+    IntStream.range(0, itemList.size())
+        .forEach(i -> {
+          Stock stock = itemList.get(i).getStock();
+          int currentQuantity = stock.getQuantity();
+          int orderQuantity = itemOrders.get(i).getQuantity();
+
+          stock.setQuantity(currentQuantity - orderQuantity);
+        });
+  }
+
+  private void increaseSellerRevenues(HashMap<Long, Long> sellerRevenues) {
+    sellerRevenues.forEach((sellerId, profit) -> {
+      // 판매자의 계좌 조회시(findByMemberId), row-level의 락을 검
+      SellerRevenue sellerRevenue = sellerRevenueRepository.findByMemberId(sellerId)
+          .orElseThrow(() -> new BusinessException(ErrorCode.SELLER_NOT_FOUND));
+
+      sellerRevenue.setRevenue(sellerRevenue.getRevenue() + profit);
+    });
+  }
+
+  private Order createAndSaveOrder(Long buyerId, List<Item> itemList, List<ItemOrderDto> itemOrders, long totalPrice) {
+
+    // OrderItem은 현재 주문 시점의 가격과 이름을 저장하고 있는 테이블
+    List<OrderItem> orderItemList = IntStream.range(0, itemList.size())
+        .mapToObj(i -> OrderItem.of(itemList.get(i), itemOrders.get(i).getQuantity()))
+        .collect(Collectors.toList());
+
+    Order order = Order.builder()
+        .buyerId(buyerId)
+        .orderStatus(OrderStatus.COMPLETED)
+        .totalPrice(totalPrice)
+        .orderItems(orderItemList)
+        .build();
+
+    orderRepository.save(order);
+
+    return order;
   }
 }

@@ -15,7 +15,16 @@ public enum ErrorCode {
   LOGIN_EMAIL_INVALID(400, "E0006", "로그인에 입력한 이메일이 올바르지 않습니다"),
   LOGIN_PASSWORD_INVALID(400, "E0007", "로그인에 입력한 비밀번호가 올바르지 않습니다."),
   BUYER_NOT_FOUND(400, "E0008", "존재하지 않는 구매자입니다."),
-  BALANCE_NOT_FOUND(500, "E0009", "판매자의 잔액 정보가 존재하지 않습니다.");
+  BALANCE_NOT_FOUND(500, "E0009", "판매자의 잔액 정보가 존재하지 않습니다."),
+
+  UNORDERABLE_ITEM_INCLUDED(400, "E0010", "SELL_STOPPED, SOLD_OUT 상태의 상품이 주문에 포함되어 있습니다."),
+
+  ITEM_NOT_EXIST(400, "E0011", "해당 아이템이 존재하지 않습니다."),
+  OUT_OF_STOCK_ITEM_INCLUDED(400,"E0012","주문을 하기 위한 해당 상품의 재고가 부족합니다."),
+  BUYER_BALANCE_NOT_FOUND(500, "E0013", "해당 사용자의 잔액 정보가 조회되지 않습니다."),
+
+  INSUFFICIENT_BALANCE(400, "E00014", "주문을 진행하기에 계좌 잔고가 부족합니다.");
+
 
   private final int status;
   private final String code;

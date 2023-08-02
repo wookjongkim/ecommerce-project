@@ -5,9 +5,14 @@ import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.domain.dto.BuyerItemResponseDto;
 import com.example.ecommerceproject.domain.dto.ChargeDto;
 import com.example.ecommerceproject.domain.dto.MemberInfoDto;
+import com.example.ecommerceproject.domain.dto.OrderRequestDto;
+import com.example.ecommerceproject.domain.dto.OrderResponseDto;
+import com.example.ecommerceproject.domain.dto.response.ApiResponse;
 import com.example.ecommerceproject.domain.dto.response.SuccessResponse;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.service.BuyerService;
+import com.example.ecommerceproject.util.ValidUtil;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,11 +40,12 @@ public class BuyerController {
   @PostMapping("/{buyerId}/balance")
   public ResponseEntity<SuccessResponse> chargeBalance(
       @PathVariable Long buyerId, @RequestBody ChargeDto chargeDto
-  ){
+  ) {
 
     MemberInfoDto infoDto = buyerService.chargeBalance(buyerId, chargeDto.getChargeVal());
 
-    return new ResponseEntity<>(new SuccessResponse(200, "잔액 충전이 완료되었습니다.", infoDto), HttpStatus.OK);
+    return new ResponseEntity<>(new SuccessResponse(200, "잔액 충전이 완료되었습니다.", infoDto),
+        HttpStatus.OK);
   }
 
   @GetMapping("/items")
@@ -51,10 +58,11 @@ public class BuyerController {
       @RequestParam(required = false) Category category,
       @RequestParam(defaultValue = "0") Integer page,
       @RequestParam(defaultValue = "20") Integer size
-  ){
-    Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.fromString(priceOrder), "price"));
+  ) {
+    Pageable pageable = PageRequest.of(page, size,
+        Sort.by(Sort.Direction.fromString(priceOrder), "price"));
 
-    if(saleStatus == null){
+    if (saleStatus == null) {
       saleStatus = ItemSellStatus.SELL;
     }
 
@@ -62,6 +70,21 @@ public class BuyerController {
         maxPrice, priceOrder, saleStatus, category, pageable);
 
     return new ResponseEntity<>(new SuccessResponse(200, "상품 조회가 완료되었습니다.", items),
+        HttpStatus.OK);
+  }
+
+  @PostMapping("/{buyerId}/orders")
+  public ResponseEntity<ApiResponse> orderItems(
+      @PathVariable Long buyerId, @Valid @RequestBody OrderRequestDto orderRequestDto,
+      BindingResult bindingResult
+  ) {
+    if(bindingResult.hasErrors()){
+      return ValidUtil.extractErrorMessages(bindingResult);
+    }
+
+    OrderResponseDto orderResponseDto = buyerService.orderItems(buyerId, orderRequestDto);
+
+    return new ResponseEntity<>(new SuccessResponse<>(200, "주문이 완료되었습니다.", orderResponseDto),
         HttpStatus.OK);
   }
 }

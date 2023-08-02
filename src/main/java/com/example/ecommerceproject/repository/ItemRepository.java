@@ -12,4 +12,6 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
   Optional<Item> findByIdAndSellerId(long itemId, long sellerId);
 
   List<Item> findAllBySaleStatusInAndUpdatedAtBefore(List<ItemSellStatus> statuses, LocalDateTime time);
+
+  List<Item> findByIdIn(List<Long> ids);
 }
