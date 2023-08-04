@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,7 +54,7 @@ public class Item extends BaseTimeEntity {
   private ItemSellStatus saleStatus;
 
   // 단방향으로 설계, Item 조회 시 Stock 엔티티도 함께 로딩됨(Eager Loading이 @OneToOne의 default)
-  @OneToOne(cascade = CascadeType.PERSIST)
+  @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
   @JoinColumn(name = "stock_id")
   private Stock stock;
 
