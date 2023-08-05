@@ -23,8 +23,10 @@ public enum ErrorCode {
   OUT_OF_STOCK_ITEM_INCLUDED(400,"E0012","주문을 하기 위한 해당 상품의 재고가 부족합니다."),
   BUYER_BALANCE_NOT_FOUND(500, "E0013", "해당 사용자의 잔액 정보가 조회되지 않습니다."),
 
-  INSUFFICIENT_BALANCE(400, "E00014", "주문을 진행하기에 계좌 잔고가 부족합니다.");
-
+  INSUFFICIENT_BALANCE(400, "E0014", "주문을 진행하기에 계좌 잔고가 부족합니다."),
+  ORDER_NOT_FOUND(400, "E0015", "존재하지 않는 주문 정보입니다."),
+  ORDER_ALREADY_CANCELED(400, "E0016", "이미 취소된 주문 입니다."),
+  SELLER_REVENUE_NOT_FOUND(500, "E0017", "판매자의 수익 계좌가 존재하지 않습니다.");
 
   private final int status;
   private final String code;

@@ -87,7 +87,7 @@ public class BuyerServiceImpl implements BuyerService {
     List<ItemOrderDto> itemOrders = orderRequestDto.getItemOrders();
 
     // 주문하려는 상품 중 SOLD_OUT or SELL_STOPPED 상태의 상품이 있는지 조회
-    validateOrderStatus(itemList);
+    validateItemStatus(itemList);
 
     // 주문하려는 상품의 재고가 충분한지 확인
     validateStockAvailability(itemList, itemOrders);
@@ -124,7 +124,7 @@ public class BuyerServiceImpl implements BuyerService {
     return items;
   }
 
-  private void validateOrderStatus(List<Item> itemList) {
+  private void validateItemStatus(List<Item> itemList) {
     if (isOrderStatusUnorderable(itemList)) {
       throw new BusinessException(ErrorCode.UNORDERABLE_ITEM_INCLUDED);
     }
@@ -171,7 +171,8 @@ public class BuyerServiceImpl implements BuyerService {
     buyerBalance.setBalance(buyerBalance.getBalance() - totalPrice);
   }
 
-  private HashMap<Long, Long> getSellersRevenue(List<Item> itemList, List<ItemOrderDto> itemOrders) {
+  private HashMap<Long, Long> getSellersRevenue(List<Item> itemList,
+      List<ItemOrderDto> itemOrders) {
     HashMap<Long, Long> map = new HashMap<>();
 
     IntStream.range(0, itemList.size())
@@ -205,7 +206,8 @@ public class BuyerServiceImpl implements BuyerService {
     });
   }
 
-  private Order createAndSaveOrder(Long buyerId, List<Item> itemList, List<ItemOrderDto> itemOrders, long totalPrice) {
+  private Order createAndSaveOrder(Long buyerId, List<Item> itemList, List<ItemOrderDto> itemOrders,
+      long totalPrice) {
 
     // OrderItem은 현재 주문 시점의 가격과 이름을 저장하고 있는 테이블
     List<OrderItem> orderItemList = IntStream.range(0, itemList.size())
@@ -222,5 +224,78 @@ public class BuyerServiceImpl implements BuyerService {
     orderRepository.save(order);
 
     return order;
+  }
+
+  @Override
+  @Transactional
+  public String cancelOrder(Long buyerId, Long orderId) {
+
+    Member member = memberRepository.findById(buyerId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.BUYER_NOT_FOUND));
+
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+    // 이미 취소된 주문인지 검증
+    validateOrderStatus(order);
+
+    // 해당 주문 시 구매했던 상품들 조회
+    List<OrderItem> orderItems = order.getOrderItems();
+
+    // 주문 취소한 상품들의 재고를 올리고, 구매자의 잔고를 올리고, 판매자의 수익은 감소 시킴
+    addStocks(orderItems);
+
+    decreaseSellerRevenue(orderItems);
+
+    increaseBuyerBalance(member, order);
+
+    order.setOrderStatus(OrderStatus.CANCELED);
+
+    return "주문 취소가 완료되었습니다 :)";
+  }
+
+  private void validateOrderStatus(Order order) {
+    if (order.getOrderStatus() == OrderStatus.CANCELED) {
+      // 이미 취소 된 주문인 경우
+      throw new BusinessException(ErrorCode.ORDER_ALREADY_CANCELED);
+    }
+  }
+
+  private void addStocks(List<OrderItem> orderItems) {
+
+    orderItems.forEach(orderItem -> {
+      Item item = itemRepository.findById(orderItem.getItemId())
+          .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_EXIST));
+
+      // 재고에 대해 락을 검
+      Stock stock = stockRepository.findByIdForUpdate(item.getStock().getId())
+          .orElseThrow(() -> new BusinessException(ErrorCode.STOCK_NOT_FOUND));
+
+      stock.setQuantity(stock.getQuantity() + orderItem.getQuantity());
+    });
+  }
+
+  private void decreaseSellerRevenue(List<OrderItem> orderItems) {
+    orderItems.forEach(orderItem -> {
+      Item item = itemRepository.findById(orderItem.getItemId())
+          .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_EXIST));
+
+      Member member = memberRepository.findById(item.getSellerId())
+          .orElseThrow(() -> new BusinessException(ErrorCode.SELLER_NOT_FOUND));
+
+      SellerRevenue sellerRevenue = sellerRevenueRepository.findByMemberId(member.getId())
+          .orElseThrow(() -> new BusinessException(ErrorCode.SELLER_REVENUE_NOT_FOUND));
+
+      sellerRevenue.setRevenue(sellerRevenue.getRevenue() - (orderItem.getPrice() * orderItem.getQuantity()));
+    });
+  }
+
+  private void increaseBuyerBalance(Member member, Order order) {
+
+    // 구매자 계좌에 락을 검
+    BuyerBalance buyerBalance = buyerBalanceRepository.findByMemberId(member.getId())
+        .orElseThrow(() -> new BusinessException(ErrorCode.BUYER_BALANCE_NOT_FOUND));
+
+    buyerBalance.setBalance(buyerBalance.getBalance() + order.getTotalPrice());
   }
 }
