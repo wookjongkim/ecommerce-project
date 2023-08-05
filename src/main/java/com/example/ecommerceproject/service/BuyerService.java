@@ -18,4 +18,6 @@ public interface BuyerService {
       String priceOrder, ItemSellStatus itemSellStatus, Category category, Pageable pageable);
 
   OrderResponseDto orderItems(Long buyerId, OrderRequestDto orderRequestDto);
+
+  String cancelOrder(Long buyerId, Long orderId);
 }

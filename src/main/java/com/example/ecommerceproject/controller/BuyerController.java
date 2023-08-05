@@ -23,8 +23,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -86,5 +88,14 @@ public class BuyerController {
 
     return new ResponseEntity<>(new SuccessResponse<>(200, "주문이 완료되었습니다.", orderResponseDto),
         HttpStatus.OK);
+  }
+
+  @PatchMapping ("/{buyerId}/orders/{orderId}/cancel")
+  public ResponseEntity<ApiResponse> cancelOrder(
+      @PathVariable Long buyerId, @PathVariable Long orderId
+  ){
+    String msg = buyerService.cancelOrder(buyerId, orderId);
+
+    return new ResponseEntity(new ApiResponse(200, msg), HttpStatus.OK);
   }
 }
