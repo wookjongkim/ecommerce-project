@@ -90,6 +90,16 @@ public class BuyerController {
         HttpStatus.OK);
   }
 
+  @GetMapping("/{buyerId}/orders/{orderId}")
+  public ResponseEntity<SuccessResponse> lookUpOrder(@PathVariable Long buyerId,
+      @PathVariable Long orderId
+  ){
+    OrderResponseDto responseDto = buyerService.lookupOrder(buyerId, orderId);
+
+    return new ResponseEntity<>(new SuccessResponse(200, "주문 조회가 완료되었습니다.",
+        responseDto), HttpStatus.OK);
+  }
+
   @PatchMapping ("/{buyerId}/orders/{orderId}/cancel")
   public ResponseEntity<ApiResponse> cancelOrder(
       @PathVariable Long buyerId, @PathVariable Long orderId

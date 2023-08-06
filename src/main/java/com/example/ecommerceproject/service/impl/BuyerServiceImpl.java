@@ -298,4 +298,21 @@ public class BuyerServiceImpl implements BuyerService {
 
     buyerBalance.setBalance(buyerBalance.getBalance() + order.getTotalPrice());
   }
+
+  @Override
+  @Transactional(readOnly = true)
+  public OrderResponseDto lookupOrder(Long buyerId, Long orderId) {
+    Member member = memberRepository.findById(buyerId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.BUYER_NOT_FOUND));
+
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+    if(order.getBuyerId() != buyerId){
+      // 구매자가 본인이 주문한 것이 아닌 주문 정보를 조회하려는 경우 예외 발생
+      throw new BusinessException(ErrorCode.UNAUTHORIZED_ORDER_ACCESS);
+    }
+
+    return OrderResponseDto.of(order);
+  }
 }
