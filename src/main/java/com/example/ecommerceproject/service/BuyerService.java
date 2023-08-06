@@ -20,4 +20,6 @@ public interface BuyerService {
   OrderResponseDto orderItems(Long buyerId, OrderRequestDto orderRequestDto);
 
   String cancelOrder(Long buyerId, Long orderId);
+
+  OrderResponseDto lookupOrder(Long buyerId, Long orderId);
 }

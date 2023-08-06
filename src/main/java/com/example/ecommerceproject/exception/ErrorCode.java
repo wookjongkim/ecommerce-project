@@ -27,7 +27,9 @@ public enum ErrorCode {
   ORDER_NOT_FOUND(400, "E0015", "존재하지 않는 주문 정보입니다."),
   ORDER_ALREADY_CANCELED(400, "E0016", "이미 취소된 주문 입니다."),
   SELLER_REVENUE_NOT_FOUND(500, "E0017", "판매자의 수익 계좌가 존재하지 않습니다."),
-  INSUFFICIENT_REVENUE(400, "E0018", "출금하려는 금액보다 판매자 분의 수익이 적습니다.");
+  INSUFFICIENT_REVENUE(400, "E0018", "출금하려는 금액보다 판매자 분의 수익이 적습니다."),
+
+  UNAUTHORIZED_ORDER_ACCESS(403, "E0019", "조회 할 수 없는 주문입니다.");
 
   private final int status;
   private final String code;
