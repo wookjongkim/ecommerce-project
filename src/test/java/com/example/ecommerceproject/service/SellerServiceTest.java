@@ -18,13 +18,17 @@ import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
 import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
+import com.example.ecommerceproject.domain.dto.WithdrawDto;
+import com.example.ecommerceproject.domain.dto.WithdrawResponseDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
+import com.example.ecommerceproject.domain.model.SellerRevenue;
 import com.example.ecommerceproject.domain.model.Stock;
 import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.ItemRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.repository.SellerRevenueRepository;
 import com.example.ecommerceproject.repository.StockRepository;
 import com.example.ecommerceproject.service.impl.SellerServiceImpl;
 import java.util.Optional;
@@ -48,6 +52,9 @@ class SellerServiceTest {
 
   @Mock
   private StockRepository stockRepository;
+
+  @Mock
+  private SellerRevenueRepository sellerRevenueRepository;
 
   @InjectMocks
   private SellerServiceImpl sellerService;
@@ -222,5 +229,57 @@ class SellerServiceTest {
     // Then
     assertThat(itemResponseDto).isNotNull();
     assertThat(itemResponseDto.getQuantity()).isEqualTo(200);
+  }
+
+  @Test
+  @DisplayName("판매자가 본인의 수익보다 더 큰 금액을 출금하려할 시 에러 발생")
+  void withdraw_withInsufficientRevenue(){
+    // Given
+    Long sellerId = 1L;
+    Long revenue = 5000L;
+
+    SellerRevenue mockSellerRevenue = SellerRevenue
+        .builder()
+        .revenue(revenue)
+        .build();
+
+    when(sellerRevenueRepository.findByMemberId(sellerId))
+        .thenReturn(Optional.of(mockSellerRevenue));
+
+    // 판매자의 수익보다 1000원 더 큰 금액
+    WithdrawDto withdrawDto = new WithdrawDto(revenue + 1000L);
+
+    // When
+    BusinessException exception = assertThrows(BusinessException.class, () -> {
+      sellerService.withdrawBalance(sellerId, withdrawDto);
+    });
+
+    // Then
+    assertEquals(ErrorCode.INSUFFICIENT_REVENUE, exception.getErrorCode());
+  }
+
+  @Test
+  @DisplayName("판매자가 본인의 수익 내에서 금액을 정상적으로 출금")
+  void withdraw_withSufficientRevenue(){
+    //Given
+    Long sellerId = 1L;
+    Long revenue = 5000L;
+
+    SellerRevenue mockSellerRevenue = SellerRevenue
+        .builder()
+        .revenue(revenue)
+        .build();
+
+    when(sellerRevenueRepository.findByMemberId(sellerId))
+        .thenReturn(Optional.of(mockSellerRevenue));
+
+    // 수익보다 1000원 작은 금액 출금
+    WithdrawDto withdrawDto = new WithdrawDto(revenue - 1000L);
+
+    // When
+    WithdrawResponseDto response = sellerService.withdrawBalance(sellerId, withdrawDto);
+
+    // Then
+    assertEquals(1000L, response.getBalance());
   }
 }
