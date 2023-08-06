@@ -5,6 +5,8 @@ import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
 import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
+import com.example.ecommerceproject.domain.dto.WithdrawDto;
+import com.example.ecommerceproject.domain.dto.WithdrawResponseDto;
 import com.example.ecommerceproject.domain.model.Item;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;
@@ -23,5 +25,7 @@ public interface SellerService {
   ItemUpdateDto editItem(Long sellerId, Long itemId, ItemUpdateDto itemUpdateDto);
 
   SellerItemResponseDto addStock(Long sellerId, Long itemId, int addNum);
+
+  WithdrawResponseDto withdrawBalance(Long sellerId, WithdrawDto withdrawDto);
 }
 

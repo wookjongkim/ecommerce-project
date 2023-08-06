@@ -5,13 +5,17 @@ import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
 import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
+import com.example.ecommerceproject.domain.dto.WithdrawDto;
+import com.example.ecommerceproject.domain.dto.WithdrawResponseDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
+import com.example.ecommerceproject.domain.model.SellerRevenue;
 import com.example.ecommerceproject.domain.model.Stock;
 import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.ItemRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
+import com.example.ecommerceproject.repository.SellerRevenueRepository;
 import com.example.ecommerceproject.repository.StockRepository;
 import com.example.ecommerceproject.repository.spec.ItemSpecification;
 import com.example.ecommerceproject.service.SellerService;
@@ -32,6 +36,7 @@ public class SellerServiceImpl implements SellerService {
   private final MemberRepository memberRepository;
   private final ItemRepository itemRepository;
   private final StockRepository stockRepository;
+  private final SellerRevenueRepository sellerRevenueRepository;
 
   // @Transactional 사용 이유
   // 만약 트랜잭션을 사용하지 않았다면, 각각의 DB 작업(INSERT, UPDATE 등등)은 별개의 트랜잭션으로 취급됨
@@ -133,5 +138,24 @@ public class SellerServiceImpl implements SellerService {
 //    stockRepository.save(stock);
 
     return SellerItemResponseDto.of(item);
+  }
+
+  @Override
+  @Transactional
+  public WithdrawResponseDto withdrawBalance(Long sellerId, WithdrawDto withdrawDto) {
+
+    // 이 과정에서 sellerRevenue에 대해 락이 걸림
+    SellerRevenue sellerRevenue = sellerRevenueRepository.findByMemberId(sellerId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.SELLER_REVENUE_NOT_FOUND));
+
+    Long withdrawAmount = withdrawDto.getAmount();
+
+    if(sellerRevenue.getRevenue() < withdrawAmount){
+      throw new BusinessException(ErrorCode.INSUFFICIENT_REVENUE);
+    }
+
+    sellerRevenue.setRevenue(sellerRevenue.getRevenue() - withdrawAmount);
+
+    return WithdrawResponseDto.of(sellerRevenue.getRevenue());
   }
 }
