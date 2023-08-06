@@ -5,6 +5,8 @@ import com.example.ecommerceproject.domain.dto.ItemDetailDto;
 import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
 import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
 import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
+import com.example.ecommerceproject.domain.dto.WithdrawDto;
+import com.example.ecommerceproject.domain.dto.WithdrawResponseDto;
 import com.example.ecommerceproject.domain.dto.response.ApiResponse;
 import com.example.ecommerceproject.domain.dto.response.SuccessResponse;
 import com.example.ecommerceproject.service.SellerService;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -109,11 +112,25 @@ public class SellerController {
   // PUT을 사용할수도 있지만 이 경우엔 멱등성을 가지지 않기에 POST가 어울린다고 판단.
   @PostMapping("/{sellerId}/items/{itemId}/stock")
   public ResponseEntity<SuccessResponse> addItemStock(@PathVariable Long sellerId,
-      @PathVariable Long itemId, int addNum){
+      @PathVariable Long itemId, int addNum) {
 
     SellerItemResponseDto item = sellerService.addStock(sellerId, itemId, addNum);
 
-    return new ResponseEntity<>(new SuccessResponse(200, "재고 추가가 완료되었습니다.",item),
+    return new ResponseEntity<>(new SuccessResponse(200, "재고 추가가 완료되었습니다.", item),
         HttpStatus.OK);
+  }
+
+  @PostMapping("/{sellerId}/balance/withdraw")
+  public ResponseEntity<SuccessResponse> withdraw(@PathVariable Long sellerId,
+      @Valid @RequestBody WithdrawDto withdrawDto, BindingResult bindingResult) {
+
+    if (bindingResult.hasErrors()) {
+      ValidUtil.extractErrorMessages(bindingResult);
+    }
+
+    WithdrawResponseDto responseDto = sellerService.withdrawBalance(sellerId, withdrawDto);
+
+    return new ResponseEntity(new SuccessResponse(200, "출금이 완료되었습니다. "
+        + "남은 잔고는 다음과 같습니다.", responseDto), HttpStatus.OK);
   }
 }
