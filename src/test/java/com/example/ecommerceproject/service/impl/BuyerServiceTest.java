@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.example.ecommerceproject.constant.OrderStatus;
 import com.example.ecommerceproject.constant.Role;
 import com.example.ecommerceproject.domain.dto.MemberInfoDto;
+import com.example.ecommerceproject.domain.dto.OrderResponseDto;
 import com.example.ecommerceproject.domain.model.BuyerBalance;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
@@ -180,5 +181,70 @@ class BuyerServiceTest {
     assertEquals(6, stock.getQuantity());
     assertEquals(1000, buyerBalance.getBalance());
     assertEquals(0, sellerRevenue.getRevenue());
+  }
+
+  @Test
+  @DisplayName("주문 조회 테스트 - 구매자가 본인이 주문한 것이 아닌 경우")
+  void lookupOrder_UnAuthorizedAccess(){
+    // Given
+    Order mockOrder = Order.builder()
+        .id(1L)
+        .buyerId(2L).build();
+
+    when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(mockOrder));
+
+    // When
+    BusinessException exception = assertThrows(BusinessException.class, () -> {
+      buyerService.lookupOrder(1L, 1L);
+    });
+
+    // Then
+    assertEquals(ErrorCode.UNAUTHORIZED_ORDER_ACCESS, exception.getErrorCode());
+  }
+
+  @Test
+  @DisplayName("주문 조회 테스트 - 성공")
+  void lookUpOrder_Success(){
+    // Given
+    OrderItem mockOrderItem1 = OrderItem.builder()
+        .id(1L)
+        .itemId(101L)
+        .name("item1")
+        .price(100)
+        .quantity(2)
+        .build();
+
+    OrderItem mockOrderItem2 = OrderItem.builder()
+        .id(2L)
+        .itemId(102L)
+        .name("item2")
+        .price(200)
+        .quantity(1)
+        .build();
+
+    List<OrderItem> mockOrderItems = new ArrayList<>();
+    mockOrderItems.add(mockOrderItem1);
+    mockOrderItems.add(mockOrderItem2);
+
+    Order mockOrder = Order.builder()
+        .id(1L)
+        .buyerId(1L)
+        .totalPrice(400L)
+        .orderStatus(OrderStatus.COMPLETED)
+        .orderItems(mockOrderItems)
+        .build();
+
+    when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(mockOrder));
+
+    // When
+    OrderResponseDto response = buyerService.lookupOrder(1L, 1L);
+
+    // Then
+    assertEquals(1L, response.getOrderId());
+    assertEquals(1L, response.getUserId());
+    assertEquals(400L, response.getTotalPrice());
+    assertEquals(2, response.getItems().size());
   }
 }
