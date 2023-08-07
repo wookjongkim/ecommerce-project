@@ -105,7 +105,7 @@ public class BuyerServiceImpl implements BuyerService {
     increaseSellerRevenues(getSellersRevenue(itemList, itemOrders));
 
     // 주문 정보를 생성 후 저장
-    Order order = createAndSaveOrder(buyerId, itemList, itemOrders, totalPrice);
+    Order order = saveOrder(buyerId, itemList, itemOrders, totalPrice);
 
     // Response 형식에 맞게 Convert
     return OrderResponseDto.of(order);
@@ -206,7 +206,7 @@ public class BuyerServiceImpl implements BuyerService {
     });
   }
 
-  private Order createAndSaveOrder(Long buyerId, List<Item> itemList, List<ItemOrderDto> itemOrders,
+  private Order saveOrder(Long buyerId, List<Item> itemList, List<ItemOrderDto> itemOrders,
       long totalPrice) {
 
     // OrderItem은 현재 주문 시점의 가격과 이름을 저장하고 있는 테이블
