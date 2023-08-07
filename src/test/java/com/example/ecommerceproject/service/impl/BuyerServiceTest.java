@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 
 import com.example.ecommerceproject.constant.OrderStatus;
 import com.example.ecommerceproject.constant.Role;
-import com.example.ecommerceproject.domain.dto.MemberInfoDto;
-import com.example.ecommerceproject.domain.dto.OrderResponseDto;
+import com.example.ecommerceproject.domain.dto.response.MemberInfoDto;
+import com.example.ecommerceproject.domain.dto.response.OrderResponseDto;
 import com.example.ecommerceproject.domain.model.BuyerBalance;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;

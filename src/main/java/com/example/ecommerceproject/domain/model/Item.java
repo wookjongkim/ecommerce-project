@@ -2,7 +2,7 @@ package com.example.ecommerceproject.domain.model;
 
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
-import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
+import com.example.ecommerceproject.domain.dto.request.ItemFormRequestDto;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;

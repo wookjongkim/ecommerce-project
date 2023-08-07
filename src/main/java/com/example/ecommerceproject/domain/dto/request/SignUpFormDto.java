@@ -1,4 +1,4 @@
-package com.example.ecommerceproject.domain.dto;
+package com.example.ecommerceproject.domain.dto.request;
 
 import com.example.ecommerceproject.constant.Role;
 import javax.validation.constraints.Email;

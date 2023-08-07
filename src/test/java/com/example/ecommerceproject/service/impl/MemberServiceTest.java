@@ -7,8 +7,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.ecommerceproject.constant.Role;
-import com.example.ecommerceproject.domain.dto.LoginFormDto;
-import com.example.ecommerceproject.domain.dto.SignUpFormDto;
+import com.example.ecommerceproject.domain.dto.request.LoginFormDto;
+import com.example.ecommerceproject.domain.dto.request.SignUpFormDto;
 import com.example.ecommerceproject.domain.model.Member;
 import com.example.ecommerceproject.exception.BusinessException;
 import com.example.ecommerceproject.exception.ErrorCode;

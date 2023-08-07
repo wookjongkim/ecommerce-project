@@ -1,4 +1,4 @@
-package com.example.ecommerceproject.domain.dto;
+package com.example.ecommerceproject.domain.dto.response;
 
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;

@@ -1,14 +1,14 @@
 package com.example.ecommerceproject.controller;
 
 import com.example.ecommerceproject.constant.ItemSellStatus;
-import com.example.ecommerceproject.domain.dto.ItemDetailDto;
-import com.example.ecommerceproject.domain.dto.ItemFormRequestDto;
-import com.example.ecommerceproject.domain.dto.ItemUpdateDto;
-import com.example.ecommerceproject.domain.dto.SellerItemResponseDto;
-import com.example.ecommerceproject.domain.dto.WithdrawDto;
-import com.example.ecommerceproject.domain.dto.WithdrawResponseDto;
-import com.example.ecommerceproject.domain.dto.response.ApiResponse;
-import com.example.ecommerceproject.domain.dto.response.SuccessResponse;
+import com.example.ecommerceproject.domain.dto.response.ItemDetailDto;
+import com.example.ecommerceproject.domain.dto.request.ItemFormRequestDto;
+import com.example.ecommerceproject.domain.dto.response.ItemUpdateDto;
+import com.example.ecommerceproject.domain.dto.response.SellerItemResponseDto;
+import com.example.ecommerceproject.domain.dto.request.WithdrawDto;
+import com.example.ecommerceproject.domain.dto.response.WithdrawResponseDto;
+import com.example.ecommerceproject.domain.dto.response.common.ApiResponse;
+import com.example.ecommerceproject.domain.dto.response.common.SuccessResponse;
 import com.example.ecommerceproject.service.SellerService;
 import com.example.ecommerceproject.util.ValidUtil;
 import java.time.LocalDate;

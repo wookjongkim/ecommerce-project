@@ -1,4 +1,4 @@
-package com.example.ecommerceproject.domain.dto;
+package com.example.ecommerceproject.domain.dto.request;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

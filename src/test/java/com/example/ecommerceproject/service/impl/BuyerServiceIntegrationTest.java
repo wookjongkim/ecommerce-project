@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.constant.Role;
-import com.example.ecommerceproject.domain.dto.BuyerItemResponseDto;
+import com.example.ecommerceproject.domain.dto.response.BuyerItemResponseDto;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.domain.model.Member;
 import com.example.ecommerceproject.domain.model.Stock;

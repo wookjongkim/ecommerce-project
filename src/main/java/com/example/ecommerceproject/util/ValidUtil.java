@@ -1,7 +1,7 @@
 package com.example.ecommerceproject.util;
 
 import com.example.ecommerceproject.constant.Role;
-import com.example.ecommerceproject.domain.dto.response.ApiResponse;
+import com.example.ecommerceproject.domain.dto.response.common.ApiResponse;
 import com.example.ecommerceproject.domain.model.Member;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -2,10 +2,10 @@ package com.example.ecommerceproject.service;
 
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
-import com.example.ecommerceproject.domain.dto.BuyerItemResponseDto;
-import com.example.ecommerceproject.domain.dto.MemberInfoDto;
-import com.example.ecommerceproject.domain.dto.OrderRequestDto;
-import com.example.ecommerceproject.domain.dto.OrderResponseDto;
+import com.example.ecommerceproject.domain.dto.response.BuyerItemResponseDto;
+import com.example.ecommerceproject.domain.dto.response.MemberInfoDto;
+import com.example.ecommerceproject.domain.dto.request.OrderRequestDto;
+import com.example.ecommerceproject.domain.dto.response.OrderResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

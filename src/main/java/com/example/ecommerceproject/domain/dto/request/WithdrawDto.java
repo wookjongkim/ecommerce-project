@@ -1,4 +1,4 @@
-package com.example.ecommerceproject.domain.dto;
+package com.example.ecommerceproject.domain.dto.request;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;

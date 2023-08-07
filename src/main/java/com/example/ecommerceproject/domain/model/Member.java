@@ -2,7 +2,7 @@ package com.example.ecommerceproject.domain.model;
 
 
 import com.example.ecommerceproject.constant.Role;
-import com.example.ecommerceproject.domain.dto.SignUpFormDto;
+import com.example.ecommerceproject.domain.dto.request.SignUpFormDto;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
