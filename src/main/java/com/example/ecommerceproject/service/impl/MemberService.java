@@ -11,15 +11,11 @@ import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.BuyerBalanceRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
 import com.example.ecommerceproject.repository.SellerRevenueRepository;
-import com.example.ecommerceproject.util.ValidUtil;
 import java.util.Optional;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @Service
 @RequiredArgsConstructor

@@ -3,8 +3,6 @@ package com.example.ecommerceproject.domain.dto;
 import com.example.ecommerceproject.constant.Category;
 import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.domain.model.Item;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

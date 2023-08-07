@@ -1,6 +1,5 @@
 package com.example.ecommerceproject.domain.dto;
 
-import com.example.ecommerceproject.constant.Role;
 import com.example.ecommerceproject.domain.model.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,5 @@
 package com.example.ecommerceproject.domain.dto;
 
-import com.example.ecommerceproject.domain.model.SellerRevenue;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

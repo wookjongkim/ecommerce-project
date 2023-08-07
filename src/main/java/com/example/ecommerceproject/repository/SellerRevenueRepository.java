@@ -1,6 +1,5 @@
 package com.example.ecommerceproject.repository;
 
-import com.example.ecommerceproject.domain.model.BuyerBalance;
 import com.example.ecommerceproject.domain.model.SellerRevenue;
 import java.util.Optional;
 import javax.persistence.LockModeType;

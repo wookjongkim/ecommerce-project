@@ -1,7 +1,6 @@
 package com.example.ecommerceproject.domain.dto;
 
 import com.example.ecommerceproject.constant.Role;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

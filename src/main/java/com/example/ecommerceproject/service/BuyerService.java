@@ -6,7 +6,6 @@ import com.example.ecommerceproject.domain.dto.BuyerItemResponseDto;
 import com.example.ecommerceproject.domain.dto.MemberInfoDto;
 import com.example.ecommerceproject.domain.dto.OrderRequestDto;
 import com.example.ecommerceproject.domain.dto.OrderResponseDto;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
