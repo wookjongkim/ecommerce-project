@@ -29,7 +29,6 @@ import com.example.ecommerceproject.repository.ItemRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
 import com.example.ecommerceproject.repository.SellerRevenueRepository;
 import com.example.ecommerceproject.repository.StockRepository;
-import com.example.ecommerceproject.service.impl.SellerServiceImpl;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +55,7 @@ class SellerServiceTest {
   private SellerRevenueRepository sellerRevenueRepository;
 
   @InjectMocks
-  private SellerServiceImpl sellerService;
+  private SellerService sellerService;
 
   @Test
   @DisplayName("판매자의 상품 등록 테스트")

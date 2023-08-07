@@ -1,4 +1,4 @@
-package com.example.ecommerceproject.service.impl;
+package com.example.ecommerceproject.service;
 
 import com.example.ecommerceproject.constant.Role;
 import com.example.ecommerceproject.domain.dto.request.LoginFormDto;

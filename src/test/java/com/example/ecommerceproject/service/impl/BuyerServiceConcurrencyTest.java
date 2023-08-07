@@ -11,6 +11,7 @@ import com.example.ecommerceproject.domain.dto.request.OrderRequestDto.ItemOrder
 import com.example.ecommerceproject.domain.dto.response.OrderResponseDto;
 import com.example.ecommerceproject.domain.dto.request.SignUpFormDto;
 import com.example.ecommerceproject.service.BuyerService;
+import com.example.ecommerceproject.service.MemberService;
 import com.example.ecommerceproject.service.SellerService;
 import java.util.ArrayList;
 import java.util.Collections;

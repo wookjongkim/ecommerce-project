@@ -3,6 +3,7 @@ package com.example.ecommerceproject.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import com.example.ecommerceproject.domain.model.Item;
 import com.example.ecommerceproject.repository.ItemRepository;
+import com.example.ecommerceproject.service.ScheduledService;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -26,6 +26,7 @@ import com.example.ecommerceproject.repository.MemberRepository;
 import com.example.ecommerceproject.repository.OrderRepository;
 import com.example.ecommerceproject.repository.SellerRevenueRepository;
 import com.example.ecommerceproject.repository.StockRepository;
+import com.example.ecommerceproject.service.BuyerService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +62,7 @@ class BuyerServiceTest {
   private ItemRepository itemRepository;
 
   @InjectMocks
-  private BuyerServiceImpl buyerService;
+  private BuyerService buyerService;
 
   private Member member;
   private BuyerBalance buyerBalance;

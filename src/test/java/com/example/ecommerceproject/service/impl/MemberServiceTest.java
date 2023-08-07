@@ -15,6 +15,7 @@ import com.example.ecommerceproject.exception.ErrorCode;
 import com.example.ecommerceproject.repository.BuyerBalanceRepository;
 import com.example.ecommerceproject.repository.MemberRepository;
 import com.example.ecommerceproject.repository.SellerRevenueRepository;
+import com.example.ecommerceproject.service.MemberService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

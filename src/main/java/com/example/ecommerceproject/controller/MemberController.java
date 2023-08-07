@@ -4,7 +4,7 @@ package com.example.ecommerceproject.controller;
 import com.example.ecommerceproject.domain.dto.request.LoginFormDto;
 import com.example.ecommerceproject.domain.dto.request.SignUpFormDto;
 import com.example.ecommerceproject.domain.dto.response.common.ApiResponse;
-import com.example.ecommerceproject.service.impl.MemberService;
+import com.example.ecommerceproject.service.MemberService;
 import com.example.ecommerceproject.util.ValidUtil;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.ecommerceproject.service.impl;
+package com.example.ecommerceproject.service;
 
 import com.example.ecommerceproject.constant.ItemSellStatus;
 import com.example.ecommerceproject.domain.model.Item;
