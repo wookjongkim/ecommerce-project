@@ -51,7 +51,7 @@ public class SellerServiceImpl implements SellerService {
     Member member = memberRepository.findById(sellerId)
         .orElseThrow(() -> new BusinessException(ErrorCode.SELLER_NOT_FOUND));
 
-    if(!ValidUtil.isSeller(member)){
+    if (!ValidUtil.isSeller(member)) {
       // 판매자가 아닌 경우 상품 등록 불가
       throw new BusinessException(ErrorCode.UNAUTHORIZED_REQUEST);
     }
@@ -75,11 +75,12 @@ public class SellerServiceImpl implements SellerService {
   @Override
   // readOnly 사용시, Hibernate와 같은 JPA 구현체는 내부적으로 데이터 변경을 체크하는 작업을 최소화하거나 생략하여 성능 향상
   @Transactional(readOnly = true)
-  public Page<SellerItemResponseDto> getItems(Long sellerId, LocalDate startDate, LocalDate endDate, int minPrice,
+  public Page<SellerItemResponseDto> getItems(Long sellerId, LocalDate startDate, LocalDate endDate,
+      int minPrice,
       int maxPrice, ItemSellStatus itemSellStatus, String quantityOrder, Pageable pageable) {
 
     LocalDateTime startDateTime = startDate.atStartOfDay();
-    LocalDateTime endDateTime = endDate.atTime(23,59,59);
+    LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
 
     Specification<Item> spec = Specification
         .where(ItemSpecification.withSellerId(sellerId))
@@ -108,14 +109,29 @@ public class SellerServiceImpl implements SellerService {
     Item item = itemRepository.findByIdAndSellerId(sellerId, itemId)
         .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_MATCH));
 
-    item.setItemName(itemUpdateDto.getItemName());
-    item.setPrice(itemUpdateDto.getPrice());
-    item.setItemDetail(itemUpdateDto.getItemDetail());
-    item.setSaleStatus(itemUpdateDto.getSaleStatus());
-    item.setCateGory(itemUpdateDto.getCategory());
+    if (itemUpdateDto.getItemName() != null) {
+      item.setItemName(itemUpdateDto.getItemName());
+    }
 
-    // 변경된 엔티티 저장 (JPA의 역속성 컨텍스트에 의해 자동으로 DB에 반영됩니다)
-    itemRepository.save(item);
+    if (itemUpdateDto.getPrice() != null) {
+      item.setPrice(itemUpdateDto.getPrice());
+    }
+
+    if (itemUpdateDto.getItemDetail() != null) {
+      item.setItemDetail(itemUpdateDto.getItemDetail());
+    }
+
+    if (itemUpdateDto.getSaleStatus() != null) {
+      item.setSaleStatus(itemUpdateDto.getSaleStatus());
+    }
+
+    if (itemUpdateDto.getCategory() != null) {
+      item.setCateGory(itemUpdateDto.getCategory());
+    }
+//    변경된 엔티티 저장 따로 할 필요 X
+//    트랜잭션(@Transactional) 범위 내에서 가져온 (ex: findByIdAndSellerId) JPA 엔티티는 영속성 컨텍스트에 의해 관리됨
+//    이렇게 관리되는 엔티티에 대한 변경 사항은 트랜잭션 종료 시점에 JPA에 의해 자동으로 DB에 반영(더티 체킹)
+//    itemRepository.save(item);
 
     return ItemUpdateDto.of(item);
   }
@@ -126,10 +142,8 @@ public class SellerServiceImpl implements SellerService {
     Item item = itemRepository.findByIdAndSellerId(itemId, sellerId)
         .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_MATCH));
 
-
     Stock stock = stockRepository.findByIdForUpdate(item.getStock().getId())
         .orElseThrow(() -> new BusinessException(ErrorCode.STOCK_NOT_FOUND));
-
 
     stock.setQuantity(stock.getQuantity() + addNum);
 
@@ -150,7 +164,7 @@ public class SellerServiceImpl implements SellerService {
 
     Long withdrawAmount = withdrawDto.getAmount();
 
-    if(sellerRevenue.getRevenue() < withdrawAmount){
+    if (sellerRevenue.getRevenue() < withdrawAmount) {
       throw new BusinessException(ErrorCode.INSUFFICIENT_REVENUE);
     }
 
