@@ -92,7 +92,10 @@ public class BuyerService {
     long totalPrice = calculateTotalPrice(itemList, itemOrders);
 
     // 구매자의 잔고가 충분한지 확인
-    validateBuyerBalance(buyerId, totalPrice);
+    BuyerBalance buyerBalance = checkBuyerBalance(buyerId, totalPrice);
+
+    // 구매자의 잔고 차감
+    deductBuyerBalance(buyerBalance, totalPrice);
 
     // 구매 하고자 하는 상품의 재고를 감소시킴
     reduceStock(itemList, itemOrders);
@@ -155,7 +158,7 @@ public class BuyerService {
         .sum();
   }
 
-  private void validateBuyerBalance(Long buyerId, long totalPrice) {
+  private BuyerBalance checkBuyerBalance(Long buyerId, Long totalPrice) {
     // 이 과정에서 구매자의 계좌 조회시(findByMemberId) row-level의 락을 검
     BuyerBalance buyerBalance = buyerBalanceRepository.findByMemberId(buyerId)
         .orElseThrow(() -> new BusinessException(ErrorCode.BUYER_BALANCE_NOT_FOUND));
@@ -164,6 +167,10 @@ public class BuyerService {
       throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE);
     }
 
+    return buyerBalance;
+  }
+
+  private void deductBuyerBalance(BuyerBalance buyerBalance, long totalPrice) {
     buyerBalance.setBalance(buyerBalance.getBalance() - totalPrice);
   }
 
