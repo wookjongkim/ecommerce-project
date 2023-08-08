@@ -77,37 +77,47 @@ public class BuyerService {
     return items.map(BuyerItemResponseDto::of);
   }
 
+  /**
+   * 주어진 구매자 ID와 주문 요청 정보를 기반으로 아이템을 주문하는 메서드.
+   *
+   * 1. 주문하려는 아이템 목록을 검색하여 가져온다.
+   * 2. 가져온 아이템의 상태와 재고를 검증한다.
+   * 3. 총 구매 가격을 계산한다.
+   * 4. 구매자의 잔고를 확인하고 결제 금액만큼 차감한다.
+   * 5. 각 아이템의 재고를 감소시키고 판매자의 수익을 증가시킨다.
+   * 6. 주문 정보를 생성하고 저장한 후, 응답용 DTO로 변환하여 반환한다.
+   *
+   * @param buyerId 구매자의 ID
+   * @param orderRequestDto 주문 요청 정보
+   * @return 주문 완료 후의 응답 정보 DTO
+   */
   @Transactional
   public OrderResponseDto orderItems(Long buyerId, OrderRequestDto orderRequestDto) {
     List<Item> itemList = retrieveItemList(orderRequestDto);
     List<ItemOrderDto> itemOrders = orderRequestDto.getItemOrders();
 
-    // 주문하려는 상품 중 SOLD_OUT or SELL_STOPPED 상태의 상품이 있는지 조회
-    validateItemStatus(itemList);
+    validateItemsBeforeOrdering(itemList, itemOrders);
 
-    // 주문하려는 상품의 재고가 충분한지 확인
-    validateStockAvailability(itemList, itemOrders);
-
-    // 총 구매 금액 계산
     long totalPrice = calculateTotalPrice(itemList, itemOrders);
+    processBuyerTransaction(buyerId, totalPrice);
+    adjustStocksAndRevenues(itemList, itemOrders);
 
-    // 구매자의 잔고가 충분한지 확인
+    return OrderResponseDto.of(saveOrder(buyerId, itemList, itemOrders, totalPrice));
+  }
+
+  private void validateItemsBeforeOrdering(List<Item> itemList, List<ItemOrderDto> itemOrders) {
+    validateItemStatus(itemList);
+    validateStockAvailability(itemList, itemOrders);
+  }
+
+  private void processBuyerTransaction(Long buyerId, long totalPrice) {
     BuyerBalance buyerBalance = checkBuyerBalance(buyerId, totalPrice);
-
-    // 구매자의 잔고 차감
     deductBuyerBalance(buyerBalance, totalPrice);
+  }
 
-    // 구매 하고자 하는 상품의 재고를 감소시킴
+  private void adjustStocksAndRevenues(List<Item> itemList, List<ItemOrderDto> itemOrders) {
     reduceStock(itemList, itemOrders);
-
-    // 각 판매자의 대한 수익을 계산한 후, 이를 판매자의 계좌 반영
     increaseSellerRevenues(getSellersRevenue(itemList, itemOrders));
-
-    // 주문 정보를 생성 후 저장
-    Order order = saveOrder(buyerId, itemList, itemOrders, totalPrice);
-
-    // Response 형식에 맞게 Convert
-    return OrderResponseDto.of(order);
   }
 
   private List<Item> retrieveItemList(OrderRequestDto orderRequestDto) {
